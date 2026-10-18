@@ -6,6 +6,11 @@ interface Props { archiveTitle: string; author?: any; editData?: any; posts?: an
 const { archiveTitle, author = {}, editData, posts = [], currentPage = 1, totalPages = 1, basePath = "" } = Astro.props;
 const href = (p:any) => { const url = getBlogPermalink(p); return url.endsWith('/') ? url : url + '/'; };
 const formatDate = (v:any) => v ? new Date(v).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : "";
+const categoryName = (p:any) => {
+  const category = Array.isArray(p?.categories) ? p.categories[0] : p?.category;
+  if (category && typeof category === "object") return category.name || category.title || "";
+  return String(category || "").split("/").pop()?.replace(/\.json$/i,"").replace(/-/g," ") || "";
+};
 const lead = posts[0]; const rest = posts.slice(1);
 const pageUrl = (n:number) => n <= 1 ? `${basePath}/` : `${basePath}/page/${n}/`;
 ---
@@ -14,7 +19,7 @@ const pageUrl = (n:number) => n <= 1 ? `${basePath}/` : `${basePath}/page/${n}/`
     {author?.avatar && <img src={author.avatar} alt={archiveTitle} data-tina-field={editData ? tinaField(editData,"avatar") : undefined}/>}<div><span>{author?.role}</span><h1 data-tina-field={editData ? tinaField(editData,"name") : undefined}>{archiveTitle}</h1>{author?.bio && <p data-tina-field={editData ? tinaField(editData,"bio") : undefined}>{author.bio}</p>}</div>
   </div></section>
   {lead && <section class="nx-shell nx-lead-story"><a href={href(lead)}><img src={lead.heroImage} alt={lead.heroImageAlt || ""}/><span class="nx-lead-story__copy"><small>{author.latestLabel}</small><strong>{lead.title}</strong><em>{lead.description}</em><span class="nx-byline"><b>{archiveTitle}</b><i>·</i>{formatDate(lead.pubDate)}<i>·</i>{lead.readingTime}</span></span></a></section>}
-  {rest.length > 0 && <section class="nx-shell nx-archive-grid">{rest.map((post:any)=><a class="nx-archive-card" href={href(post)}><img src={post.heroImage} alt={post.heroImageAlt || ""}/><strong>{post.title}</strong><p>{post.description}</p><span>{formatDate(post.pubDate)} <i>·</i> {post.readingTime}</span></a>)}</section>}
+  {rest.length > 0 && <section class="nx-shell nx-archive-grid">{rest.map((post:any)=><a class="nx-archive-card" href={href(post)}><img src={post.heroImage} alt={post.heroImageAlt || ""}/><strong>{post.title}</strong><p>{post.description}</p><span class="nx-archive-card__meta"><b class="nx-archive-card__taxonomy">{categoryName(post)}</b><span>{formatDate(post.pubDate)}</span></span></a>)}</section>}
   {totalPages > 1 && <nav class="nx-pagination"><a href={pageUrl(currentPage-1)}>← Previous</a><span>{currentPage} / {totalPages}</span><a href={pageUrl(currentPage+1)}>Next →</a></nav>}
   <CTA />
 </main>

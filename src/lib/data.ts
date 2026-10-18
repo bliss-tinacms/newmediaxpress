@@ -548,6 +548,7 @@ export async function getBlog(slug: string) {
 			permalink
 			pubDate
 			updatedDate
+			readingTime
 			categories
 			author { ... on User { name role avatar bio email _sys { filename } } }
 			heroImage
@@ -733,6 +734,7 @@ export async function listBlogs() {
 					permalink
 					pubDate
 					updatedDate
+					readingTime
 					heroImage
 					heroImageAlt
 					seo { metaTitle metaDescription ogTitle ogDescription ogImage canonicalUrl noindex nofollow }
