@@ -212,7 +212,9 @@ function tinaDirectContentApiUrl() {
 }
 
 function tinaApiToken() {
-	return import.meta.env.TINA_TOKEN || process.env.TINA_TOKEN || '';
+	// Runtime-only secret: never read via import.meta.env because Vite can inline it
+	// into the built server bundle during a production build.
+	return process.env.TINA_TOKEN || '';
 }
 
 
