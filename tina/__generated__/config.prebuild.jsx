@@ -401,6 +401,11 @@ var CategoryCollection = {
         component: "textarea"
       }
     },
+    {
+      type: "string",
+      name: "latestLabel",
+      label: "Latest Story Label"
+    },
     seoFields
   ]
 };
@@ -851,7 +856,11 @@ var aboutMockup17BlockSchema = {
         { name: "breadcrumbLabel", label: "Breadcrumb Home Label", type: "string" },
         { name: "eyebrow", label: "Eyebrow", type: "string" },
         { name: "headline", label: "Headline", type: "string" },
-        { name: "lede", label: "Lede", type: "string", ui: { component: "textarea" } }
+        { name: "headlineHighlight", label: "Highlighted Headline Text", type: "string" },
+        { name: "lede", label: "Lede", type: "string", ui: { component: "textarea" } },
+        { name: "ledeHighlight", label: "Highlighted Lede Text", type: "string" },
+        { name: "image", label: "Feature Image", type: "image" },
+        { name: "imageAlt", label: "Feature Image Alt Text", type: "string" }
       ]
     },
     {
@@ -932,6 +941,8 @@ var aboutMockup17BlockSchema = {
       fields: [
         { name: "eyebrow", label: "Eyebrow", type: "string" },
         { name: "title", label: "Title", type: "string" },
+        { name: "image", label: "Image", type: "image" },
+        { name: "imageAlt", label: "Image Alt Text", type: "string" },
         { name: "intro", label: "Intro", type: "string", ui: { component: "textarea" } },
         { name: "paragraphTwo", label: "Paragraph 2", type: "string", ui: { component: "textarea" } },
         {
@@ -1036,6 +1047,7 @@ var ourTeamMockup17BlockSchema = {
       { name: "breadcrumbLabel", label: "Breadcrumb Home Label", type: "string" },
       { name: "eyebrow", label: "Eyebrow", type: "string" },
       { name: "headline", label: "Headline", type: "string" },
+      { name: "headlineHighlight", label: "Highlighted Headline Text", type: "string" },
       { name: "lede", label: "Lede", type: "string", ui: { component: "textarea" } }
     ] },
     { type: "object", name: "leadership", label: "Leadership Section", fields: [
@@ -1077,6 +1089,7 @@ var homepageTemplateBlockSchema = {
       fields: [
         { name: "eyebrow", label: "Eyebrow", type: "string" },
         { name: "title", label: "Headline", type: "string" },
+        { name: "accentTitle", label: "Accent Headline", type: "string" },
         { name: "description", label: "Description", type: "string", ui: { component: "textarea" } },
         { name: "buttonText", label: "Featured Story Label", type: "string", description: "Text label shown beside the hero eyebrow. This is not a button and does not link anywhere." },
         { name: "buttonLink", label: "Unused Legacy Link", type: "string", description: "Kept only for TinaCloud schema compatibility. The Featured Story label does not use this link." },
@@ -1113,6 +1126,7 @@ var homepageTemplateBlockSchema = {
       fields: [
         { name: "heading", label: "Latest News Heading", type: "string" },
         { name: "subheading", label: "Latest News Subheading", type: "string" },
+        { name: "subheadingLink", label: "Latest News Link", type: "string" },
         { name: "submitHeading", label: "Submit Panel Heading", type: "string" },
         { name: "submitButtonText", label: "Submit Button Text", type: "string" },
         { name: "submitButtonLink", label: "Submit Button Link", type: "string" },
@@ -1126,6 +1140,21 @@ var homepageTemplateBlockSchema = {
             { name: "text", label: "Text", type: "string", ui: { component: "textarea" } }
           ]
         }
+      ]
+    },
+    {
+      type: "object",
+      list: true,
+      name: "featuredStories",
+      label: "Featured Story Cards",
+      fields: [
+        { name: "number", label: "Number", type: "string" },
+        { name: "category", label: "Category", type: "string" },
+        { name: "title", label: "Title", type: "string" },
+        { name: "meta", label: "Read Time", type: "string" },
+        { name: "image", label: "Image", type: "image" },
+        { name: "imageAlt", label: "Image Alt Text", type: "string" },
+        { name: "link", label: "Link", type: "string" }
       ]
     },
     {
@@ -1302,7 +1331,7 @@ var PageCollection = {
       list: true,
       name: "blocks",
       label: "Page Sections",
-      description: "The visible content of the page. When the page starts with a Hero block, its Headline is the main on-page heading \xE2\u20AC\u201D edit that to change what visitors see at the top.",
+      description: "The visible content of the page. When the page starts with a Hero block, its Headline is the main on-page heading \u2014 edit that to change what visitors see at the top.",
       ui: { visualSelector: true },
       templates: [
         homepageTemplateBlockSchema,

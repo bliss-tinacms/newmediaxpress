@@ -12,62 +12,68 @@ const publishing = block?.independence;
 const readers = block?.newsroom;
 const coverageItems = Array.isArray(coverage?.items) ? coverage.items : [];
 const valueItems = Array.isArray(values?.items) ? values.items : [];
+
+function highlightedParts(value = '', highlight = '') {
+  const start = highlight ? value.toLowerCase().indexOf(highlight.toLowerCase()) : -1;
+  return start < 0
+    ? { before: value, highlight: '', after: '' }
+    : { before: value.slice(0, start), highlight: value.slice(start, start + highlight.length), after: value.slice(start + highlight.length) };
+}
+const heroTitle = highlightedParts(hero?.headline, hero?.headlineHighlight);
+const heroLede = highlightedParts(hero?.lede, hero?.ledeHighlight);
 ---
 
-<main class="nx-info nx-info--about">
-  <section class="nx-info-hero">
-    <div class="nx-shell nx-info-hero__inner">
-      <nav class="nx-crumbs" aria-label="Breadcrumb">
-        <a href="/" data-tina-field={hero ? tinaField(hero, 'breadcrumbLabel') : undefined}>{hero?.breadcrumbLabel}</a>
-        <span aria-hidden="true">/</span>
-        <span data-tina-field={hero ? tinaField(hero, 'eyebrow') : undefined}>{hero?.eyebrow}</span>
+<main class="nx-about-page">
+  <section class="nx-about-hero">
+    <div class="nx-shell nx-about-hero__inner">
+      <nav class="nx-about-crumb" aria-label="Breadcrumb">
+        <a href="/" data-tina-field={hero ? tinaField(hero, 'breadcrumbLabel') : undefined}>{hero?.breadcrumbLabel}</a><span>/</span><span data-tina-field={hero ? tinaField(hero, 'eyebrow') : undefined}>{hero?.eyebrow}</span>
       </nav>
-      <h1 data-tina-field={hero ? tinaField(hero, 'headline') : undefined}>{hero?.headline}</h1>
-      <p data-tina-field={hero ? tinaField(hero, 'lede') : undefined}>{hero?.lede}</p>
+      <h1 data-tina-field={hero ? tinaField(hero, 'headline') : undefined}>{heroTitle.before}<em>{heroTitle.highlight}</em>{heroTitle.after}</h1>
+      <p data-tina-field={hero ? tinaField(hero, 'lede') : undefined}>{heroLede.before}<strong>{heroLede.highlight}</strong>{heroLede.after}</p>
     </div>
   </section>
 
-  <section class="nx-info-section nx-info-split">
-    <div class="nx-shell nx-info-split__grid">
+  <div class="nx-shell nx-about-feature">
+    <img src={hero?.image} alt={hero?.imageAlt || ''} data-tina-field={hero ? tinaField(hero, 'image') : undefined} />
+  </div>
+
+  <section class="nx-about-section nx-about-mission">
+    <div class="nx-shell nx-about-split">
       <header>
-        <p class="nx-info-kicker" data-tina-field={purpose ? tinaField(purpose, 'eyebrow') : undefined}>{purpose?.eyebrow}</p>
+        <p class="nx-about-kicker" data-tina-field={purpose ? tinaField(purpose, 'eyebrow') : undefined}>{purpose?.eyebrow}</p>
         <h2 data-tina-field={purpose ? tinaField(purpose, 'title') : undefined}>{purpose?.title}</h2>
       </header>
-      <div class="nx-info-copy">
-        <p data-tina-field={purpose ? tinaField(purpose, 'paragraphOne') : undefined}>{purpose?.paragraphOne}</p>
+      <div class="nx-about-copy">
+        <p class="nx-about-copy__lead" data-tina-field={purpose ? tinaField(purpose, 'paragraphOne') : undefined}>{purpose?.paragraphOne}</p>
         <p data-tina-field={purpose ? tinaField(purpose, 'paragraphTwo') : undefined}>{purpose?.paragraphTwo}</p>
       </div>
     </div>
   </section>
 
-  <section class="nx-info-section nx-coverage">
+  <section class="nx-about-section nx-about-coverage">
     <div class="nx-shell">
-      <div class="nx-info-split__grid">
+      <div class="nx-about-split">
         <header>
-          <p class="nx-info-kicker" data-tina-field={coverage ? tinaField(coverage, 'eyebrow') : undefined}>{coverage?.eyebrow}</p>
+          <p class="nx-about-kicker" data-tina-field={coverage ? tinaField(coverage, 'eyebrow') : undefined}>{coverage?.eyebrow}</p>
           <h2 data-tina-field={coverage ? tinaField(coverage, 'title') : undefined}>{coverage?.title}</h2>
         </header>
-        <div class="nx-info-copy">
+        <div class="nx-about-copy">
           <p data-tina-field={coverage ? tinaField(coverage, 'intro') : undefined}>{coverage?.intro}</p>
           <p data-tina-field={coverage ? tinaField(coverage, 'paragraphTwo') : undefined}>{coverage?.paragraphTwo}</p>
         </div>
       </div>
-      <div class="nx-coverage__links">
-        {coverageItems.map((item: any) => (
-          <a href={item.link}>
-            <span data-tina-field={tinaField(item, 'title')}>{item.title}</span>
-            <i aria-hidden="true">→</i>
-          </a>
-        ))}
+      <div class="nx-about-topics">
+        {coverageItems.map((item: any) => <a href={item.link}><span data-tina-field={tinaField(item, 'title')}>{item.title}</span><i>→</i></a>)}
       </div>
     </div>
   </section>
 
-  <section class="nx-info-section nx-values">
+  <section class="nx-about-section nx-about-values">
     <div class="nx-shell">
-      <p class="nx-info-kicker" data-tina-field={values ? tinaField(values, 'eyebrow') : undefined}>{values?.eyebrow}</p>
+      <p class="nx-about-kicker" data-tina-field={values ? tinaField(values, 'eyebrow') : undefined}>{values?.eyebrow}</p>
       <h2 data-tina-field={values ? tinaField(values, 'title') : undefined}>{values?.title}</h2>
-      <div class="nx-values__grid">
+      <div class="nx-about-values__list">
         {valueItems.map((item: any) => (
           <article>
             <b data-tina-field={tinaField(item, 'number')}>{item.number}</b>
@@ -76,40 +82,26 @@ const valueItems = Array.isArray(values?.items) ? values.items : [];
           </article>
         ))}
       </div>
-      <p class="nx-values__note" data-tina-field={values ? tinaField(values, 'intro') : undefined}>{values?.intro}</p>
+      <p class="nx-about-values__note" data-tina-field={values ? tinaField(values, 'intro') : undefined}>{values?.intro}</p>
     </div>
   </section>
 
-  <section class="nx-info-section nx-publishing">
-    <div class="nx-shell nx-info-split__grid">
-      <header>
-        <p class="nx-info-kicker" data-tina-field={publishing ? tinaField(publishing, 'eyebrow') : undefined}>{publishing?.eyebrow}</p>
-        <h2 data-tina-field={publishing ? tinaField(publishing, 'title') : undefined}>{publishing?.title}</h2>
-      </header>
-      <div class="nx-info-copy">
-        <p data-tina-field={publishing ? tinaField(publishing, 'paragraphOne') : undefined}>{publishing?.paragraphOne}</p>
-        <p data-tina-field={publishing ? tinaField(publishing, 'paragraphTwo') : undefined}>{publishing?.paragraphTwo}</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="nx-info-section nx-readers">
-    <div class="nx-shell nx-info-split__grid">
-      <header>
-        <p class="nx-info-kicker" data-tina-field={readers ? tinaField(readers, 'eyebrow') : undefined}>{readers?.eyebrow}</p>
-        <h2 data-tina-field={readers ? tinaField(readers, 'title') : undefined}>{readers?.title}</h2>
-      </header>
-      <div class="nx-info-copy">
-        <p data-tina-field={readers ? tinaField(readers, 'intro') : undefined}>{readers?.intro}</p>
-        <p data-tina-field={readers ? tinaField(readers, 'paragraphTwo') : undefined}>{readers?.paragraphTwo}</p>
-      </div>
-    </div>
+  <section class="nx-shell nx-about-editorial">
+    {[publishing, readers].map((section: any) => (
+      <article>
+        <img src={section?.image} alt={section?.imageAlt || ''} data-tina-field={section ? tinaField(section, 'image') : undefined} />
+        <p class="nx-about-kicker" data-tina-field={section ? tinaField(section, 'eyebrow') : undefined}>{section?.eyebrow}</p>
+        <h3 data-tina-field={section ? tinaField(section, 'title') : undefined}>{section?.title}</h3>
+        <p data-tina-field={section ? tinaField(section, section === publishing ? 'paragraphOne' : 'intro') : undefined}>{section === publishing ? section?.paragraphOne : section?.intro}</p>
+        <p data-tina-field={section ? tinaField(section, 'paragraphTwo') : undefined}>{section?.paragraphTwo}</p>
+      </article>
+    ))}
   </section>
 
   <CTA />
 </main>
 
 <style>
-  .nx-info{color:#0f1e33;background:#fff}.nx-info :global(h1),.nx-info :global(h2),.nx-info :global(h3),.nx-info :global(p){margin-top:0}.nx-info-hero{background:#0f1e33;color:#fff}.nx-info-hero__inner{padding-top:clamp(56px,8vw,112px);padding-bottom:clamp(48px,6vw,88px)}.nx-crumbs{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#ffffffb3}.nx-crumbs a{color:#ffffffb3}.nx-info-hero h1{max-width:1120px;margin:clamp(26px,4vw,48px) 0 24px;font-size:clamp(52px,9vw,132px);font-weight:900;font-stretch:72%;line-height:.86;letter-spacing:-.035em;text-transform:uppercase}.nx-info-hero p{max-width:870px;margin-bottom:0;font-size:clamp(18px,2vw,25px);line-height:1.55;color:#ffffffd9}.nx-info-section{padding:clamp(56px,8vw,112px) 0}.nx-info-split__grid{display:grid;grid-template-columns:minmax(280px,.82fr) minmax(360px,1.18fr);gap:clamp(40px,8vw,128px);align-items:start}.nx-info-kicker{margin-bottom:18px;color:#0b7bdb;font-size:14px;font-weight:800;text-transform:uppercase;letter-spacing:.1em}.nx-info h2{margin-bottom:0;font-size:clamp(42px,5.8vw,82px);font-weight:900;font-stretch:72%;line-height:.92;letter-spacing:-.025em;text-transform:uppercase}.nx-info-copy p{margin-bottom:24px;font-size:clamp(17px,1.55vw,20px);line-height:1.75}.nx-info-copy p:last-child{margin-bottom:0}.nx-coverage{background:#eaf4fd}.nx-coverage__links{display:grid;grid-template-columns:repeat(3,1fr);margin-top:clamp(42px,6vw,80px);border-top:2px solid #0f1e33}.nx-coverage__links a{display:flex;justify-content:space-between;gap:20px;padding:22px 18px;border-right:1px solid #aebdcd;border-bottom:1px solid #aebdcd;color:#0f1e33;font-size:18px;font-weight:800;text-transform:uppercase}.nx-coverage__links a:nth-child(3n){border-right:0}.nx-coverage__links i{color:#0b7bdb;font-size:24px;font-style:normal}.nx-values h2{margin:12px 0 clamp(36px,5vw,64px)}.nx-values__grid{display:grid;grid-template-columns:repeat(5,1fr);border-top:2px solid #0f1e33}.nx-values article{min-width:0;padding:24px 22px 12px;border-right:1px solid #ccd3dc}.nx-values article:last-child{border-right:0}.nx-values b{color:#0b7bdb;font-size:13px}.nx-values h3{margin:34px 0 8px;font-size:clamp(18px,2vw,25px);line-height:1.1;text-transform:uppercase}.nx-values article p{margin-bottom:0;color:#5b6b82;font-size:15px;line-height:1.6}.nx-values__note{max-width:780px;margin:42px 0 0;color:#5b6b82}.nx-publishing{background:#0f1e33;color:#fff}.nx-publishing .nx-info-kicker{color:#7ebff4}.nx-publishing .nx-info-copy{color:#ffffffd9}.nx-readers{background:#fff}
-  @media(max-width:760px){.nx-info-hero__inner{padding-top:52px;padding-bottom:54px}.nx-info-hero h1{font-size:clamp(48px,15vw,68px);margin-top:30px}.nx-info-hero p{font-size:17px}.nx-info-split__grid{grid-template-columns:1fr;gap:30px}.nx-info h2{font-size:clamp(40px,12vw,54px)}.nx-coverage__links{grid-template-columns:1fr}.nx-coverage__links a,.nx-coverage__links a:nth-child(3n){border-right:0}.nx-values__grid{grid-template-columns:1fr}.nx-values article{display:grid;grid-template-columns:38px 120px 1fr;gap:12px;padding:20px 0;border-right:0;border-bottom:1px solid #ccd3dc}.nx-values h3{margin:0}.nx-values article p{margin:0}.nx-values__note{margin-top:30px}}
+  .nx-about-page{background:#fff;color:#0f1e33}.nx-about-page :global(.nx-shell){max-width:1296px}.nx-about-page :global(h1),.nx-about-page :global(h2),.nx-about-page :global(h3),.nx-about-page :global(p){margin-top:0}.nx-about-hero{background:#0f1e33;color:#fff}.nx-about-hero__inner{padding-top:115px;padding-bottom:100px}.nx-about-crumb{display:flex;gap:12px;align-items:center;font-size:14px;font-weight:600;color:#aeb8c5}.nx-about-crumb a{color:#aeb8c5}.nx-about-crumb span:last-child{color:#fff}.nx-about-hero h1{max-width:1100px;color:#fff!important;margin:35px 0 36px;font-size:clamp(58px,7.5vw,108px);font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-.045em;text-transform:uppercase}.nx-about-hero h1 em{display:block;color:#1fd1d1;font-style:normal}.nx-about-hero>div>p{max-width:1100px;margin:0;font-size:clamp(24px,2.5vw,36px);font-weight:800;line-height:1.3}.nx-about-hero strong{color:#1fd1d1}.nx-about-feature{margin-top:-57px}.nx-about-feature img{width:100%;height:clamp(300px,38vw,520px);object-fit:cover}.nx-about-section{padding:100px 0}.nx-about-split{display:grid;grid-template-columns:minmax(360px,.9fr) minmax(460px,1.1fr);gap:clamp(60px,9vw,142px);align-items:start}.nx-about-kicker{margin:0 0 18px;color:#0b7bdb;font-size:14px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.nx-about-page h2{margin:0;font-size:clamp(48px,5.7vw,80px);font-weight:900;font-stretch:62%;line-height:.88;letter-spacing:-.035em;text-transform:uppercase}.nx-about-copy p{margin:0 0 26px;color:#33415a;font-size:19px;line-height:1.72}.nx-about-copy p:last-child{margin-bottom:0}.nx-about-copy .nx-about-copy__lead{color:#0f1e33;font-weight:700}.nx-about-coverage{background:#eaf4fd}.nx-about-topics{display:flex;gap:10px;margin-top:74px}.nx-about-topics a{display:flex;justify-content:space-between;gap:20px;border-radius:999px;background:#fff;padding:15px 22px;color:#0f1e33;font-size:14px;font-weight:800;letter-spacing:.05em;text-transform:uppercase}.nx-about-topics i{color:#0b7bdb;font-style:normal}.nx-about-values h2{max-width:900px;margin-bottom:60px}.nx-about-values__list{border-top:1px solid #c8d0d9}.nx-about-values__list article{display:grid;grid-template-columns:42px 630px 1fr;align-items:center;padding:22px 0;border-bottom:1px solid #c8d0d9}.nx-about-values__list b{color:#0b7bdb;font-size:20px}.nx-about-values__list h3{margin:0;font-size:31px;font-weight:900;font-stretch:70%;line-height:1;text-transform:uppercase}.nx-about-values__list article p{margin:0;color:#33415a;font-size:16px;line-height:1.55}.nx-about-values__note{max-width:850px;margin:40px 0 0;font-size:18px;font-weight:700;line-height:1.65}.nx-about-editorial{display:grid;grid-template-columns:repeat(2,1fr);gap:64px;padding-bottom:100px}.nx-about-editorial article img{width:100%;aspect-ratio:16/10;object-fit:cover;margin-bottom:26px}.nx-about-editorial h3{margin:0 0 24px;font-size:clamp(36px,3.3vw,50px);font-weight:900;font-stretch:65%;line-height:.9;text-transform:uppercase}.nx-about-editorial article>p:not(.nx-about-kicker){margin:0 0 20px;color:#33415a;font-size:17px;line-height:1.7}
+  @media(max-width:760px){.nx-about-hero__inner{padding-top:59px;padding-bottom:50px}.nx-about-hero h1{margin:26px 0 34px;font-size:47px;line-height:.91}.nx-about-hero h1 em{display:block}.nx-about-hero>div>p{font-size:24px;line-height:1.31}.nx-about-feature{margin-top:-24px}.nx-about-feature img{height:240px}.nx-about-section{padding:57px 0}.nx-about-split{grid-template-columns:1fr;gap:38px}.nx-about-page h2{font-size:40px;line-height:.91}.nx-about-copy p{font-size:18px;line-height:1.68}.nx-about-mission{padding-top:57px;padding-bottom:58px}.nx-about-coverage{padding-top:57px;padding-bottom:55px}.nx-about-topics{display:flex;flex-wrap:wrap;gap:10px;margin-top:31px}.nx-about-topics a{padding:15px 22px;gap:17px;font-size:16px}.nx-about-values{padding-top:57px;padding-bottom:62px}.nx-about-values h2{margin-bottom:28px}.nx-about-values__list article{grid-template-columns:31px 1fr;gap:12px;padding:22px 0}.nx-about-values__list h3{font-size:30px}.nx-about-values__list article p{grid-column:1/-1;font-size:18px;line-height:1.68}.nx-about-values__note{margin-top:38px;font-size:18px;line-height:1.7}.nx-about-editorial{grid-template-columns:1fr;gap:49px;padding-top:0;padding-bottom:58px}.nx-about-editorial article img{aspect-ratio:358/223;margin-bottom:20px}.nx-about-editorial h3{font-size:31px;margin-bottom:24px}.nx-about-editorial article>p:not(.nx-about-kicker){font-size:18px;line-height:1.7}.nx-about-kicker{margin-bottom:14px}}
 </style>

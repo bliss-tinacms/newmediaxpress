@@ -7,12 +7,13 @@ import PageBody from '../components/islands/PageBody.astro';
 import BlogBody from '../components/islands/BlogBody.astro';
 import DemoCategoryArchive from '../components/demo/DemoCategoryArchive.astro';
 import Demo404 from '../components/demo/Demo404.astro';
-import { getBlog, getCategory, getConfig, getPublicPage, listBlogs, listCategories, listPages, type CmsCategory, type CmsPage } from '../lib/data';
+import FrontPage from '../templates/FrontPage.astro';
+import { getBlog, getCategory, getConfig, getEditablePage, getLocalPage, getPublicPage, getUser, listBlogs, listCategories, listPages, listUsers, type CmsCategory, type CmsPage } from '../lib/data';
 import { islands } from '../lib/islands';
 
 export const prerender = false;
 
-const POSTS_PER_PAGE = 30;
+const POSTS_PER_PAGE = 7;
 const routeSlug = (Astro.params.slug ?? '').toString().toLowerCase().replace(/^\/+|\/+$/g, '');
 const config = (await getConfig()).data?.config ?? null;
 const allPages = await listPages();
@@ -42,21 +43,6 @@ function slugsFromReference(reference: unknown) {
     .map(slugFromReference)
     .filter(Boolean) as string[];
 }
-function getReferenceKey(reference: unknown) {
-  if (!reference) return null;
-  if (Array.isArray(reference)) return getReferenceKey(reference[0]);
-  if (typeof reference === 'string') return reference;
-  if (typeof reference === 'object') {
-    const item = reference as ReferenceObject;
-    return item._sys?.filename || item.title || item.name || null;
-  }
-  return null;
-}
-function getReferenceKeys(reference: unknown) {
-  return (Array.isArray(reference) ? reference : reference ? [reference] : [])
-    .map(getReferenceKey)
-    .filter(Boolean) as string[];
-}
 function findReferenceBySlug(reference: unknown, slug: string) {
   return (Array.isArray(reference) ? reference : reference ? [reference] : []).find((item) => slugFromReference(item) === slug) || null;
 }
@@ -84,15 +70,34 @@ function categoryFileMap(categories: any[]) {
 }
 
 const matchedPage = allPages.find((page: CmsPage) => getPageRouteSlug(page) === routeSlug || page._sys.filename === routeSlug);
-let view: 'page' | 'category' | 'blog' | 'not-found' = 'not-found';
+let view: 'home' | 'page' | 'category' | 'blog' | 'not-found' = 'not-found';
 let pageData: any = null;
 let pageTitle = '';
 let pageDescription = '';
 
 let categoryContext: any = null;
 let blogContext: any = null;
+let homeContext: any = null;
 
-if (matchedPage) {
+if (!routeSlug) {
+  const publicHome = await getPublicPage('home');
+  const homeData = publicHome.data?.page ?? getLocalPage('home');
+  if (homeData) {
+    const editableHome = await getEditablePage('home').catch(() => ({ data: { page: null } } as any));
+    const seo = homeData.seo ?? null;
+    view = 'home';
+    homeContext = {
+      data: homeData,
+      editData: editableHome.data?.page ?? homeData,
+      users: await listUsers(),
+      title: seo?.metaTitle || config?.seo?.title || 'New Media Xpress',
+      description: seo?.metaDescription || config?.seo?.description || 'Important stories, made clear.',
+      seo,
+    };
+  }
+}
+
+if (view === 'not-found' && matchedPage) {
   const documentSlug = matchedPage._sys.filename ?? routeSlug;
   const page = await getPublicPage(documentSlug);
   const data = page.data?.page;
@@ -142,13 +147,22 @@ if (view === 'not-found') {
   const blog = await getBlog(documentSlug);
   const data = blog.data?.blog;
   if (data?.title || data?._sys?.filename) {
-      const canonicalSlug = getBlogRouteSlug(data);
+    if (typeof data.author === 'string') {
+      const authorSlug = slugFromReference(data.author);
+      if (authorSlug) {
+        const editableAuthor = (await getUser(authorSlug)).data?.user;
+        if (editableAuthor) data.author = editableAuthor as any;
+      }
+    }
+    const canonicalSlug = getBlogRouteSlug(data);
       if (canonicalSlug && canonicalSlug !== routeSlug) return Astro.redirect(getBlogPermalink(data) + '/', 301);
-      const currentCategoryKeys = getReferenceKeys(getPostCategories(data));
-      const relatedPosts = allPosts
-        .filter((post) => post._sys.filename !== documentSlug)
-        .filter((post) => getReferenceKeys(getPostCategories(post)).some((key) => currentCategoryKeys.includes(key)))
-        .slice(0, 3);
+      const relatedCandidates = allPosts.filter((post) => post._sys.filename !== documentSlug);
+      const relatedPosts = ['technology', 'health', 'politics']
+        .map((category) => relatedCandidates.find((post) => slugsFromReference(getPostCategories(post)).includes(category)))
+        .filter(Boolean);
+      if (relatedPosts.length < 3) {
+        relatedPosts.push(...relatedCandidates.filter((post) => !relatedPosts.includes(post)).slice(0, 3 - relatedPosts.length));
+      }
       const seo = data.seo ?? null;
       const title = seo?.metaTitle || data.title || '';
       const description = seo?.metaDescription || data.description || '';
@@ -183,6 +197,23 @@ if (view === 'not-found') {
 {view === 'not-found' && (
   <Base title={pageTitle} description={pageDescription} noindex={true}>
     <Demo404 content={config?.systemPages?.notFound} />
+  </Base>
+)}
+
+{view === 'home' && homeContext && (
+  <Base
+    title={homeContext.title}
+    description={homeContext.description}
+    image={homeContext.seo?.ogImage || undefined}
+    ogTitle={homeContext.seo?.ogTitle || homeContext.title}
+    ogDescription={homeContext.seo?.ogDescription || homeContext.description}
+    canonicalUrl={homeContext.seo?.canonicalUrl || undefined}
+    noindex={homeContext.seo?.noindex || false}
+    nofollow={homeContext.seo?.nofollow || false}
+  >
+    <TinaIsland name="page" wrapper={islands.page.wrapper} params={{ slug: 'home' }} primary>
+      <FrontPage posts={allPosts} users={homeContext.users} config={config} data={homeContext.data} editData={homeContext.editData} />
+    </TinaIsland>
   </Base>
 )}
 

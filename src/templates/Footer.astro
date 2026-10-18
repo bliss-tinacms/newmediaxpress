@@ -4,6 +4,8 @@ interface Props { config?: any; navigation?: any; editData?: any; }
 const { config = {}, navigation = {}, editData } = Astro.props;
 const logo = config?.seo?.footerLogo || config?.seo?.logo || "/images/newmediaxpress/a0ac5c71a06a9c052d01c6bcff145d8a8523dfc65afeb39dba239bd44db60b90.png";
 const links = navigation?.items || [];
+const primaryLinks = links.slice(0, 6);
+const utilityLinks = links.slice(6);
 const year = new Date().getFullYear();
 ---
 <footer class="nx-footer">
@@ -11,13 +13,13 @@ const year = new Date().getFullYear();
     <div class="nx-footer__top">
       <a href="/" class="nx-footer__logo"><img src={logo} alt={config?.seo?.title || "New Media Xpress"} /></a>
       <nav class="nx-footer__nav" aria-label="Footer navigation" data-tina-field={editData ? tinaField(editData, "footerNavigation") : undefined}>
-        {links.map((item: any) => <a href={item.href || item.link || "#"}>{item.label || item.title}</a>)}
+        {primaryLinks.map((item: any) => <a href={item.href || item.link || "#"}>{item.label || item.title}</a>)}
       </nav>
     </div>
     <div class="nx-footer__rule"></div>
     <div class="nx-footer__bottom">
       <p>© {year} {config?.seo?.title}. {config?.globalText?.copyrightSuffix}</p>
-      <p>{config?.globalText?.footerTagline}</p>
+      <nav class="nx-footer__utility" aria-label="Legal navigation">{utilityLinks.map((item: any) => <a href={item.href || item.link || "#"}>{item.label || item.title}</a>)}</nav>
     </div>
   </div>
 </footer>

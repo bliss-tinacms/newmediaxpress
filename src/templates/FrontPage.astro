@@ -1,9 +1,8 @@
 ---
 import { tinaField } from "tinacms/dist/react";
 import CTA from "./CTA.astro";
-import { getBlogPermalink } from "../lib/permalinks";
 interface Props { page?: any; data?: any; editData?: any; posts?: any[]; users?: any[]; config?: any; }
-const { page: pageProp, data, editData, posts = [], users = [] } = Astro.props;
+const { page: pageProp, data, editData, users = [] } = Astro.props;
 const page = pageProp || data || {};
 const block = page?.blocks?.[0] || {};
 const editBlock = editData?.blocks?.[0];
@@ -11,20 +10,18 @@ const hero = block.hero || {};
 const coverage = block.coverage || {};
 const why = block.why || {};
 const values = block.values || {};
-const featured = posts.slice(0, 4);
+const featured = block.featuredStories || [];
 const team = block.contact?.cards || [];
 const teamUser = (name: string) => users.find((user: any) => String(user?.name || '').trim().toLowerCase() === String(name || '').trim().toLowerCase());
-const storyHref = (p:any) => { const href = getBlogPermalink(p); return href.endsWith('/') ? href : href + '/'; };
-const catLabel = (p:any) => { const c = p.categories?.[0]; return typeof c === "object" ? c?.title : String(c || "Business").split("/").pop()?.replace(/\.json$/i,""); };
 ---
 <main class="nx-home">
   <section class="nx-hero" data-tina-field={editBlock ? tinaField(editBlock, "hero") : undefined}>
     <img class="nx-hero__image" src={hero.image} alt={hero.imageAlt || ""} />
     <div class="nx-hero__wash"></div>
     <div class="nx-shell nx-hero__inner">
-      <div class="nx-tags"><a href={hero.buttonLink || "/featured/"}>{hero.buttonText || "Featured"}</a><span>● {hero.eyebrow || "Context first"}</span></div>
-      <h1>{hero.title}</h1>
-      <div class="nx-hero__copy"><span aria-hidden="true">↓</span><p>{hero.description}</p></div>
+      <div class="nx-tags"><span class="nx-tags__featured">{hero.buttonText}</span><span class="nx-tags__context"><i aria-hidden="true"></i>{hero.eyebrow}</span></div>
+      <h1>{hero.title} <span>{hero.accentTitle}</span></h1>
+      <div class="nx-hero__copy"><p>{hero.description}</p></div>
     </div>
   </section>
 
@@ -35,7 +32,7 @@ const catLabel = (p:any) => { const c = p.categories?.[0]; return typeof c === "
       <div class="nx-topic-grid">
         {(coverage.topics || []).map((topic:any, i:number) => <a class:list={["nx-topic", i === 0 && "nx-topic--lead"]} href={topic.link}>
           <img src={topic.image} alt="" /><span class="nx-topic__shade"></span>
-          <span class="nx-topic__content"><b>{topic.number}</b><strong>{topic.title}</strong><em>{topic.text}</em><i>→</i></span>
+          <span class="nx-topic__number">{topic.number}</span><span class="nx-topic__content"><strong>{topic.title}</strong><span><em>{topic.text}</em><i aria-hidden="true">→</i></span></span>
         </a>)}
       </div>
     </div>
@@ -44,7 +41,7 @@ const catLabel = (p:any) => { const c = p.categories?.[0]; return typeof c === "
   <section class="nx-about" data-tina-field={editBlock ? tinaField(editBlock, "why") : undefined}>
     <div class="nx-shell nx-about__grid">
       <div><p class="nx-kicker nx-kicker--white">{why.eyebrow}</p><h2>{why.title}</h2></div>
-      <div class="nx-about__copy"><p>{why.paragraphOne}</p><p>{why.paragraphTwo}</p><div class="nx-standards">{(why.standards || []).map((s:any,i:number)=><div><b>0{i+1}</b><strong>{s.title}</strong><span>{s.text}</span></div>)}</div></div>
+      <div class="nx-about__copy"><p>{why.paragraphOne}</p><div class="nx-standards">{(why.standards || []).map((s:any)=><div><strong>{s.title}</strong><span>{s.text}</span></div>)}</div></div>
     </div>
   </section>
 
@@ -52,10 +49,10 @@ const catLabel = (p:any) => { const c = p.categories?.[0]; return typeof c === "
     <div class="nx-shell"><p class="nx-kicker">{values.eyebrow}</p><h2>{values.title}</h2><div class="nx-value-grid">{(values.items || []).map((v:any) => <article><b>{v.number}</b><h3>{v.title}</h3><p>{v.text}</p></article>)}</div></div>
   </section>
 
-  {featured.length > 0 && <section class="nx-section nx-featured"><div class="nx-shell"><div class="nx-heading-row"><h2>{block.newsroom?.heading || "Featured"}</h2><a href="/featured/">{block.newsroom?.subheading || "All stories"} →</a></div><div class="nx-post-grid">{featured.map((post:any,i:number)=><a href={storyHref(post)}><span class="nx-post__number">0{i+1}</span><img src={post.heroImage} alt={post.heroImageAlt || ""}/><small>{catLabel(post)}</small><strong>{post.title}</strong><span>{post.description}</span></a>)}</div></div></section>}
+  {featured.length > 0 && <section class="nx-section nx-featured" data-tina-field={editBlock ? tinaField(editBlock, "featuredStories") : undefined}><div class="nx-shell"><div class="nx-heading-row"><h2>{block.newsroom?.heading}</h2><a href={block.newsroom?.subheadingLink}>{block.newsroom?.subheading} →</a></div><div class="nx-post-grid">{featured.map((post:any)=><a href={post.link}><span class="nx-post__number">{post.number}</span><img src={post.image} alt={post.imageAlt || ""}/><small>{post.category}</small><strong>{post.title}</strong><span>{post.meta}</span></a>)}</div></div></section>}
 
   <section class="nx-commitment" data-tina-field={editBlock ? tinaField(editBlock, "wireFeature") : undefined}>
-    <img src={block.wireFeature?.image} alt={block.wireFeature?.imageAlt || ""}/><div class="nx-commitment__shade"></div><div class="nx-shell nx-commitment__inner"><p class="nx-kicker nx-kicker--white">{block.wireFeature?.eyebrow}</p><blockquote>“{block.wireFeature?.quote}”</blockquote><div class="nx-person"><img src={block.wireFeature?.avatar} alt=""/><p><strong>{block.wireFeature?.author}</strong><span>{block.wireFeature?.byline}</span></p></div></div>
+    <img src={block.wireFeature?.image} alt={block.wireFeature?.imageAlt || ""}/><div class="nx-commitment__shade"></div><div class="nx-shell nx-commitment__inner"><span class="nx-quote-mark" aria-hidden="true">“</span><blockquote>{block.wireFeature?.quote}</blockquote><div class="nx-person"><img src={block.wireFeature?.avatar} alt=""/><p><strong>{block.wireFeature?.author}</strong><span>{block.wireFeature?.byline}</span></p></div></div>
   </section>
 
   <section class="nx-section nx-team" data-tina-field={editBlock ? tinaField(editBlock, "contact") : undefined}><div class="nx-shell"><p class="nx-kicker">{block.contact?.eyebrow}</p><h2>{block.contact?.title}</h2><div class="nx-team-grid">{team.map((person:any)=>{ const user = teamUser(person.title); return <a href={user?._sys?.filename ? `/author/${user._sys.filename}/` : "/our-team/"}>{user?.avatar ? <img class="nx-team__avatar nx-team__avatar--image" src={user.avatar} alt={person.title || ''}/> : <span class="nx-team__avatar">{person.title?.split(" ").map((x:string)=>x[0]).join("")}</span>}<strong>{person.title}</strong><b>{person.email}</b><small>{person.text}</small></a>})}</div></div></section>

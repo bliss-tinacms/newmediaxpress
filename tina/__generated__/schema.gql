@@ -227,6 +227,7 @@ type CategorySeo {
 type Category implements Node & Document {
   title: String!
   description: String
+  latestLabel: String
   seo: CategorySeo
   id: ID!
   _sys: SystemInfo!
@@ -247,6 +248,7 @@ input CategorySeoFilter {
 input CategoryFilter {
   title: StringFilter
   description: StringFilter
+  latestLabel: StringFilter
   seo: CategorySeoFilter
 }
 
@@ -275,6 +277,7 @@ type PageSeo {
 type PageBlocksHomepageTemplateHero {
   eyebrow: String
   title: String
+  accentTitle: String
   description: String
   buttonText: String
   buttonLink: String
@@ -304,10 +307,21 @@ type PageBlocksHomepageTemplateNewsroomPrompts {
 type PageBlocksHomepageTemplateNewsroom {
   heading: String
   subheading: String
+  subheadingLink: String
   submitHeading: String
   submitButtonText: String
   submitButtonLink: String
   prompts: [PageBlocksHomepageTemplateNewsroomPrompts]
+}
+
+type PageBlocksHomepageTemplateFeaturedStories {
+  number: String
+  category: String
+  title: String
+  meta: String
+  image: String
+  imageAlt: String
+  link: String
 }
 
 type PageBlocksHomepageTemplateWireFeature {
@@ -366,6 +380,7 @@ type PageBlocksHomepageTemplate {
   hero: PageBlocksHomepageTemplateHero
   why: PageBlocksHomepageTemplateWhy
   newsroom: PageBlocksHomepageTemplateNewsroom
+  featuredStories: [PageBlocksHomepageTemplateFeaturedStories]
   wireFeature: PageBlocksHomepageTemplateWireFeature
   coverage: PageBlocksHomepageTemplateCoverage
   values: PageBlocksHomepageTemplateValues
@@ -376,7 +391,11 @@ type PageBlocksAboutMockup17Hero {
   breadcrumbLabel: String
   eyebrow: String
   headline: String
+  headlineHighlight: String
   lede: String
+  ledeHighlight: String
+  image: String
+  imageAlt: String
 }
 
 type PageBlocksAboutMockup17Purpose {
@@ -436,6 +455,8 @@ type PageBlocksAboutMockup17NewsroomContacts {
 type PageBlocksAboutMockup17Newsroom {
   eyebrow: String
   title: String
+  image: String
+  imageAlt: String
   intro: String
   paragraphTwo: String
   contacts: [PageBlocksAboutMockup17NewsroomContacts]
@@ -454,6 +475,7 @@ type PageBlocksOurTeamMockup17Hero {
   breadcrumbLabel: String
   eyebrow: String
   headline: String
+  headlineHighlight: String
   lede: String
 }
 
@@ -675,6 +697,7 @@ input PageSeoFilter {
 input PageBlocksHomepageTemplateHeroFilter {
   eyebrow: StringFilter
   title: StringFilter
+  accentTitle: StringFilter
   description: StringFilter
   buttonText: StringFilter
   buttonLink: StringFilter
@@ -704,10 +727,21 @@ input PageBlocksHomepageTemplateNewsroomPromptsFilter {
 input PageBlocksHomepageTemplateNewsroomFilter {
   heading: StringFilter
   subheading: StringFilter
+  subheadingLink: StringFilter
   submitHeading: StringFilter
   submitButtonText: StringFilter
   submitButtonLink: StringFilter
   prompts: PageBlocksHomepageTemplateNewsroomPromptsFilter
+}
+
+input PageBlocksHomepageTemplateFeaturedStoriesFilter {
+  number: StringFilter
+  category: StringFilter
+  title: StringFilter
+  meta: StringFilter
+  image: ImageFilter
+  imageAlt: StringFilter
+  link: StringFilter
 }
 
 input PageBlocksHomepageTemplateWireFeatureFilter {
@@ -766,6 +800,7 @@ input PageBlocksHomepageTemplateFilter {
   hero: PageBlocksHomepageTemplateHeroFilter
   why: PageBlocksHomepageTemplateWhyFilter
   newsroom: PageBlocksHomepageTemplateNewsroomFilter
+  featuredStories: PageBlocksHomepageTemplateFeaturedStoriesFilter
   wireFeature: PageBlocksHomepageTemplateWireFeatureFilter
   coverage: PageBlocksHomepageTemplateCoverageFilter
   values: PageBlocksHomepageTemplateValuesFilter
@@ -776,7 +811,11 @@ input PageBlocksAboutMockup17HeroFilter {
   breadcrumbLabel: StringFilter
   eyebrow: StringFilter
   headline: StringFilter
+  headlineHighlight: StringFilter
   lede: StringFilter
+  ledeHighlight: StringFilter
+  image: ImageFilter
+  imageAlt: StringFilter
 }
 
 input PageBlocksAboutMockup17PurposeFilter {
@@ -836,6 +875,8 @@ input PageBlocksAboutMockup17NewsroomContactsFilter {
 input PageBlocksAboutMockup17NewsroomFilter {
   eyebrow: StringFilter
   title: StringFilter
+  image: ImageFilter
+  imageAlt: StringFilter
   intro: StringFilter
   paragraphTwo: StringFilter
   contacts: PageBlocksAboutMockup17NewsroomContactsFilter
@@ -854,6 +895,7 @@ input PageBlocksOurTeamMockup17HeroFilter {
   breadcrumbLabel: StringFilter
   eyebrow: StringFilter
   headline: StringFilter
+  headlineHighlight: StringFilter
   lede: StringFilter
 }
 
@@ -1470,6 +1512,7 @@ input CategorySeoMutation {
 input CategoryMutation {
   title: String
   description: String
+  latestLabel: String
   seo: CategorySeoMutation
 }
 
@@ -1487,6 +1530,7 @@ input PageSeoMutation {
 input PageBlocksHomepageTemplateHeroMutation {
   eyebrow: String
   title: String
+  accentTitle: String
   description: String
   buttonText: String
   buttonLink: String
@@ -1516,10 +1560,21 @@ input PageBlocksHomepageTemplateNewsroomPromptsMutation {
 input PageBlocksHomepageTemplateNewsroomMutation {
   heading: String
   subheading: String
+  subheadingLink: String
   submitHeading: String
   submitButtonText: String
   submitButtonLink: String
   prompts: [PageBlocksHomepageTemplateNewsroomPromptsMutation]
+}
+
+input PageBlocksHomepageTemplateFeaturedStoriesMutation {
+  number: String
+  category: String
+  title: String
+  meta: String
+  image: String
+  imageAlt: String
+  link: String
 }
 
 input PageBlocksHomepageTemplateWireFeatureMutation {
@@ -1578,6 +1633,7 @@ input PageBlocksHomepageTemplateMutation {
   hero: PageBlocksHomepageTemplateHeroMutation
   why: PageBlocksHomepageTemplateWhyMutation
   newsroom: PageBlocksHomepageTemplateNewsroomMutation
+  featuredStories: [PageBlocksHomepageTemplateFeaturedStoriesMutation]
   wireFeature: PageBlocksHomepageTemplateWireFeatureMutation
   coverage: PageBlocksHomepageTemplateCoverageMutation
   values: PageBlocksHomepageTemplateValuesMutation
@@ -1588,7 +1644,11 @@ input PageBlocksAboutMockup17HeroMutation {
   breadcrumbLabel: String
   eyebrow: String
   headline: String
+  headlineHighlight: String
   lede: String
+  ledeHighlight: String
+  image: String
+  imageAlt: String
 }
 
 input PageBlocksAboutMockup17PurposeMutation {
@@ -1648,6 +1708,8 @@ input PageBlocksAboutMockup17NewsroomContactsMutation {
 input PageBlocksAboutMockup17NewsroomMutation {
   eyebrow: String
   title: String
+  image: String
+  imageAlt: String
   intro: String
   paragraphTwo: String
   contacts: [PageBlocksAboutMockup17NewsroomContactsMutation]
@@ -1666,6 +1728,7 @@ input PageBlocksOurTeamMockup17HeroMutation {
   breadcrumbLabel: String
   eyebrow: String
   headline: String
+  headlineHighlight: String
   lede: String
 }
 

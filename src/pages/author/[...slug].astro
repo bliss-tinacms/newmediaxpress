@@ -35,6 +35,13 @@ function slugFromReference(reference: unknown) {
 	return null;
 }
 
+function categorySlugs(post: any) {
+	const values = Array.isArray(post?.categories) ? post.categories : post?.category ? [post.category] : [];
+	return values
+		.map((item: any) => slugFromReference(typeof item === 'object' && item?.category ? item.category : item))
+		.filter(Boolean) as string[];
+}
+
 function parseArchiveParam(value?: string) {
 	const parts = (value || '').toLowerCase().split('/').filter(Boolean);
 	const pageIndex = parts.indexOf('page');
@@ -85,12 +92,22 @@ export async function getStaticPaths() {
 
 const parsed = parseArchiveParam(Astro.params.slug);
 const config = (await getConfig()).data?.config ?? null;
-const allPosts = (await listBlogs()).filter((post) => slugFromReference(post.author) === parsed.slug);
+const sitePosts = await listBlogs();
+const authorPosts = sitePosts.filter((post) => slugFromReference(post.author) === parsed.slug);
+const categoryCounts = new Map<string, number>();
+for (const post of authorPosts) {
+	for (const category of categorySlugs(post)) {
+		if (category === 'featured') continue;
+		categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
+	}
+}
+const deskSlug = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
+const allPosts = deskSlug ? sitePosts.filter((post) => categorySlugs(post).includes(deskSlug)) : authorPosts;
 const totalPages = Math.max(1, Math.ceil(allPosts.length / POSTS_PER_PAGE));
 const currentPage = Math.min(Math.max(1, parsed.page), totalPages);
 const posts = allPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
 const editableAuthor = parsed.slug ? (await getUser(parsed.slug)).data?.user ?? null : null;
-const authorObject = allPosts.find((post) => post.author && typeof post.author === 'object')?.author ?? editableAuthor;
+const authorObject = authorPosts.find((post) => post.author && typeof post.author === 'object')?.author ?? editableAuthor;
 const archiveTitle = editableAuthor?.name || labelFromReference(authorObject) || Astro.props.archiveTitle || 'Author';
 const authorSeo = (editableAuthor as any)?.seo || (authorObject as any)?.seo || null;
 const basePath = '/author/' + parsed.slug;

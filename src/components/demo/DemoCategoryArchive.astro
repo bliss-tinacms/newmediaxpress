@@ -3,7 +3,6 @@ import CTA from "../../templates/CTA.astro";
 import { getBlogPermalink } from '../../lib/permalinks';
 interface Props { archiveTitle: string; category?: any; posts?: any[]; currentPage?: number; totalPages?: number; basePath?: string; showCategoryBadge?: boolean; }
 const { archiveTitle, category = {}, posts = [], currentPage = 1, totalPages = 1, basePath = "" } = Astro.props;
-const slug = (v:any) => String(v || "").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
 const href = (p:any) => { const url = getBlogPermalink(p); return url.endsWith('/') ? url : url + '/'; };
 const author = (p:any) => typeof p.author === "object" ? p.author : null;
 const authorName = (p:any) => author(p)?.name || String(p.author || "New Media Xpress").split("/").pop()?.replace(/\.json$/i,"").replace(/-/g," ");
@@ -13,7 +12,7 @@ const pageUrl = (n:number) => n <= 1 ? `${basePath}/` : `${basePath}/page/${n}/`
 ---
 <main class="nx-archive">
   <section class="nx-archive-hero"><div class="nx-shell"><h1>{archiveTitle}</h1>{category?.description && <p>{category.description}</p>}</div></section>
-  {lead && <section class="nx-shell nx-lead-story"><a href={href(lead)}><img src={lead.heroImage} alt={lead.heroImageAlt || ""}/><span class="nx-lead-story__copy"><small>{archiveTitle}</small><strong>{lead.title}</strong><em>{lead.description}</em><span class="nx-byline">{author(lead)?.avatar && <img src={author(lead).avatar} alt=""/>}<b>{authorName(lead)}</b><i>·</i>{formatDate(lead.pubDate)}<i>·</i>{lead.readingTime}</span></span></a></section>}
+  {lead && <section class="nx-shell nx-lead-story"><a href={href(lead)}><img src={lead.heroImage} alt={lead.heroImageAlt || ""}/><span class="nx-lead-story__copy"><small>{category?.latestLabel || archiveTitle}</small><strong>{lead.title}</strong><em>{lead.description}</em><span class="nx-byline">{author(lead)?.avatar && <img src={author(lead).avatar} alt=""/>}<b>{authorName(lead)}</b><i>·</i>{formatDate(lead.pubDate)}<i>·</i>{lead.readingTime}</span></span></a></section>}
   {rest.length > 0 && <section class="nx-shell nx-archive-grid">{rest.map((post:any)=><a class="nx-archive-card" href={href(post)}><img src={post.heroImage} alt={post.heroImageAlt || ""}/><strong>{post.title}</strong><p>{post.description}</p><span>{formatDate(post.pubDate)} <i>·</i> {post.readingTime}</span></a>)}</section>}
   {totalPages > 1 && <nav class="nx-pagination" aria-label="Pagination">{currentPage > 1 && <a href={pageUrl(currentPage-1)}>← Previous</a>}<span>{currentPage} / {totalPages}</span>{currentPage < totalPages && <a href={pageUrl(currentPage+1)}>Next →</a>}</nav>}
   <CTA />

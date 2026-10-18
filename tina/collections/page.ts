@@ -117,7 +117,7 @@ export const PageCollection: Collection = {
       name: 'blocks',
       label: 'Page Sections',
       description:
-        "The visible content of the page. When the page starts with a Hero block, its Headline is the main on-page heading â€” edit that to change what visitors see at the top.",
+        "The visible content of the page. When the page starts with a Hero block, its Headline is the main on-page heading — edit that to change what visitors see at the top.",
       ui: { visualSelector: true },
       templates: [
         homepageTemplateBlockSchema,

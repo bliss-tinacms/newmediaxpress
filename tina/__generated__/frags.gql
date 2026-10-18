@@ -63,6 +63,7 @@ fragment CategoryParts on Category {
   __typename
   title
   description
+  latestLabel
   seo {
     __typename
     metaTitle
@@ -99,6 +100,7 @@ fragment PageParts on Page {
         __typename
         eyebrow
         title
+        accentTitle
         description
         buttonText
         buttonLink
@@ -122,6 +124,7 @@ fragment PageParts on Page {
         __typename
         heading
         subheading
+        subheadingLink
         submitHeading
         submitButtonText
         submitButtonLink
@@ -130,6 +133,16 @@ fragment PageParts on Page {
           title
           text
         }
+      }
+      featuredStories {
+        __typename
+        number
+        category
+        title
+        meta
+        image
+        imageAlt
+        link
       }
       wireFeature {
         __typename
@@ -187,7 +200,11 @@ fragment PageParts on Page {
         breadcrumbLabel
         eyebrow
         headline
+        headlineHighlight
         lede
+        ledeHighlight
+        image
+        imageAlt
       }
       purpose {
         __typename
@@ -238,6 +255,8 @@ fragment PageParts on Page {
         __typename
         eyebrow
         title
+        image
+        imageAlt
         intro
         paragraphTwo
         contacts {
@@ -255,6 +274,7 @@ fragment PageParts on Page {
         breadcrumbLabel
         eyebrow
         headline
+        headlineHighlight
         lede
       }
       leadership {

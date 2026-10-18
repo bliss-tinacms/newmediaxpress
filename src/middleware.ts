@@ -68,6 +68,7 @@ export const onRequest = defineMiddleware(async (context, next) => {
     url.pathname === '/favicon.ico' ||
     url.pathname === '/robots.txt' ||
     url.pathname === '/sitemap-index.xml' ||
+    url.pathname === '/sitemap-0.xml' ||
     url.pathname === '/rss.xml'
   ) {
     return next();

@@ -145,7 +145,9 @@ const authorName = getReferenceLabel(postAuthor) || getReferenceLabel(data?.auth
 const authorSlug = getReferenceSlug(data?.author) || getReferenceSlug(author);
 const authorArchiveUrl = authorSlug ? `/author/${authorSlug}/` : '/blog/';
 const authorInitials = authorName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'SS';
-const categoryLabel = getReferenceLabel(getPostCategories(data)) || 'Article';
+const categoryItems = getReferenceItems(getPostCategories(data));
+const primaryCategory = categoryItems.find((item) => slugify(getSingleReferenceLabel(item) || '') !== 'featured') || categoryItems[0];
+const categoryLabel = getSingleReferenceLabel(primaryCategory) || 'Article';
 const publishedDate = data?.pubDate ? new Date(data.pubDate) : getFallbackPublishedDate(data);
 
 const tocItems = getTocItems(data?.body);
@@ -187,9 +189,11 @@ const heroImageAlt = (() => {
 						</a>
 						<div class="ah-au" data-tina-field={tinaField(data, 'author')}>
 							<div class="ah-an">By <a href={authorArchiveUrl}>{authorName}</a></div>
+							{author?.role && <div class="ah-role">{author.role}</div>}
 						</div>
 						<div class="ah-dt">
 							{publishedDate && <span data-tina-field={tinaField(data, 'pubDate')}><FormattedDate date={publishedDate} /></span>}
+							{data.readingTime && <><br /><span>{data.readingTime}</span></>}
 							{data.updatedDate && <><br /><span data-tina-field={tinaField(data, 'updatedDate')}>Updated <FormattedDate date={new Date(data.updatedDate)} /></span></>}
 						</div>
 					</div>
@@ -239,10 +243,11 @@ const heroImageAlt = (() => {
 					)}
 
 					<section id="about-author" data-tina-field={tinaField(data, 'author')} class="corr" aria-labelledby="post-author-heading">
-						<div class="corr-t">Published by</div>
-						<div class="corr-b">
+						{author?.avatar ? <img src={author.avatar} alt={authorName} width="76" height="76" /> : <span class="corr-avatar" aria-hidden="true">{authorInitials}</span>}
+						<div>
+							<div class="corr-t">About the author</div>
 							<strong id="post-author-heading"><a href={authorArchiveUrl}>{authorName}</a></strong>
-							{author?.bio ? ` — ${author.bio}` : ' — New Media Xpress newsroom contributor.'}
+							<div class="corr-b">{author?.bio || 'New Media Xpress newsroom contributor.'}</div>
 						</div>
 					</section>
 				</article>
@@ -266,8 +271,7 @@ const heroImageAlt = (() => {
 {data && relatedPosts.length > 0 && (
 	<section id="more-stories" class="mo" aria-labelledby="related-articles-heading">
 		<div class="w">
-			<div class="eye"><i></i><span>Keep reading</span></div>
-			<div class="h2" id="related-articles-heading">More in {categoryLabel}</div>
+			<div class="h2" id="related-articles-heading">Keep reading</div>
 			<div class="mo-g">
 				{relatedPosts.slice(0, 3).map((post) => (
 					<a href={getPostUrl(post)} class="mi">
@@ -275,7 +279,7 @@ const heroImageAlt = (() => {
 						<div class="mi-c">
 							<div class="mi-k">{getReferenceLabel(getPostCategories(post)) || 'Article'}</div>
 							<div class="mi-h">{getPostTitle(post)}</div>
-							<p class="mi-x">{getPostDescription(post)}</p>
+							<p class="mi-x">{post.readingTime || getPostDescription(post)}</p>
 						</div>
 					</a>
 				))}

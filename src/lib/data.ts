@@ -57,18 +57,56 @@ function readFrontmatterValue(collection: 'blog' | 'page', slug?: string | null,
 	return null;
 }
 
+function markdownInlineChildren(text: string) {
+	const children: Array<Record<string, any>> = [];
+	let cursor = 0;
+	const pattern = /\*\*([^*]+)\*\*/g;
+	for (const match of text.matchAll(pattern)) {
+		const index = match.index ?? 0;
+		if (index > cursor) children.push({ type: 'text', text: text.slice(cursor, index) });
+		children.push({ type: 'text', text: match[1], bold: true });
+		cursor = index + match[0].length;
+	}
+	if (cursor < text.length) children.push({ type: 'text', text: text.slice(cursor) });
+	return children.length ? children : [{ type: 'text', text }];
+}
+
 function markdownToTinaRichText(markdown?: string | null) {
-	const children = (markdown || '')
-		.split(/\n{2,}/)
-		.map((block) => block.trim())
-		.filter(Boolean)
-		.map((block) => {
-			const heading = block.match(/^(#{1,6})\s+(.+)$/);
-			if (heading) {
-				return { type: 'h' + Math.min(6, heading[1].length), children: [{ type: 'text', text: heading[2].trim() }] };
-			}
-			return { type: 'p', children: [{ type: 'text', text: block.replace(/\n+/g, ' ') }] };
-		});
+	const blocks = (markdown || '').split(/\n{2,}/).map((block) => block.trim()).filter(Boolean);
+	const children = blocks.map((block) => {
+		const heading = block.match(/^(#{1,6})\s+([\s\S]+)$/);
+		if (heading) return { type: 'h' + Math.min(6, heading[1].length), children: markdownInlineChildren(heading[2].trim()) };
+
+		const image = block.match(/^!\[([^\]]*)\]\(([^)\s]+)(?:\s+["']([^"']*)["'])?\)$/);
+		if (image) return { type: 'img', url: image[2], alt: image[1], caption: image[3] || undefined, children: [{ type: 'text', text: '' }] };
+
+		if (block.startsWith('>')) {
+			const text = block.replace(/^>\s?/gm, '').replace(/\n+/g, ' ').trim();
+			return { type: 'blockquote', children: markdownInlineChildren(text) };
+		}
+
+		const lines = block.split(/\r?\n/).map((line) => line.trim()).filter(Boolean);
+		if (lines.every((line) => /^[-*+]\s+/.test(line))) {
+			return {
+				type: 'ul',
+				children: lines.map((line) => ({
+					type: 'li',
+					children: [{ type: 'lic', children: markdownInlineChildren(line.replace(/^[-*+]\s+/, '')) }],
+				})),
+			};
+		}
+		if (lines.every((line) => /^\d+[.)]\s+/.test(line))) {
+			return {
+				type: 'ol',
+				children: lines.map((line) => ({
+					type: 'li',
+					children: [{ type: 'lic', children: markdownInlineChildren(line.replace(/^\d+[.)]\s+/, '')) }],
+				})),
+			};
+		}
+
+		return { type: 'p', children: markdownInlineChildren(block.replace(/\n+/g, ' ')) };
+	});
 	return { type: 'root', children };
 }
 
@@ -473,6 +511,12 @@ async function getLivePage(slug: string) {
 
 export const getPublicPage = (slug: string) => getLivePage(slug);
 
+export function getLocalPage(slug: string) {
+	const relativePath = slug.endsWith('.mdx') ? slug : `${slug}.mdx`;
+	const page = readLocalPageFrontmatter(relativePath);
+	return page ? { ...page, _sys: { filename: relativePath.replace(/\.mdx$/, '') } } : null;
+}
+
 export const getEditableBlog = async (slug: string) => {
 	const relativePath = slug.endsWith('.mdx') ? slug : `${slug}.mdx`;
 	// Query Tina Cloud directly first so Passenger never has to self-fetch the
@@ -601,6 +645,7 @@ export async function getCategory(slug: string) {
 		category(relativePath: $relativePath) {
 			title
 			description
+			latestLabel
 			seo { metaTitle metaDescription ogTitle ogDescription ogImage canonicalUrl noindex nofollow }
 			_sys { filename }
 		}
@@ -615,7 +660,7 @@ export async function getCategory(slug: string) {
 export async function listCategories() {
 	const query = `query CategoryConnection($after: String) {
 		categoryConnection(first: 100, after: $after) {
-			edges { node { title description seo { metaTitle metaDescription ogTitle ogDescription ogImage canonicalUrl noindex nofollow } _sys { filename relativePath path } } }
+			edges { node { title description latestLabel seo { metaTitle metaDescription ogTitle ogDescription ogImage canonicalUrl noindex nofollow } _sys { filename relativePath path } } }
 			pageInfo { hasNextPage endCursor }
 		}
 	}`;

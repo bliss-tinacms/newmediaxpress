@@ -6,6 +6,7 @@ export const ourTeamMockup17BlockSchema = {
       { name: 'breadcrumbLabel', label: 'Breadcrumb Home Label', type: 'string' },
       { name: 'eyebrow', label: 'Eyebrow', type: 'string' },
       { name: 'headline', label: 'Headline', type: 'string' },
+      { name: 'headlineHighlight', label: 'Highlighted Headline Text', type: 'string' },
       { name: 'lede', label: 'Lede', type: 'string', ui: { component: 'textarea' } },
     ]},
     { type: 'object', name: 'leadership', label: 'Leadership Section', fields: [

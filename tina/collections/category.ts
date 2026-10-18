@@ -27,6 +27,11 @@ export const CategoryCollection: Collection = {
         component: "textarea",
       },
     },
+    {
+      type: "string",
+      name: "latestLabel",
+      label: "Latest Story Label",
+    },
     seoFields,
   ],
 };

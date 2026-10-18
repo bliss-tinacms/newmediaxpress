@@ -9,60 +9,49 @@ const leadership = block?.leadership;
 const seniorStaff = block?.seniorStaff;
 const leaders = Array.isArray(leadership?.people) ? leadership.people : [];
 const editors = Array.isArray(seniorStaff?.people) ? seniorStaff.people : [];
+function highlightedParts(value = '', highlight = '') {
+  const start = highlight ? value.toLowerCase().indexOf(highlight.toLowerCase()) : -1;
+  return start < 0 ? { before: value, highlight: '', after: '' } : { before: value.slice(0,start), highlight: value.slice(start,start+highlight.length), after: value.slice(start+highlight.length) };
+}
+const heroTitle = highlightedParts(hero?.headline, hero?.headlineHighlight);
 ---
 
-<main class="nx-info nx-info--team">
-  <section class="nx-info-hero">
-    <div class="nx-shell nx-info-hero__inner">
-      <nav class="nx-crumbs" aria-label="Breadcrumb">
-        <a href="/" data-tina-field={hero ? tinaField(hero, 'breadcrumbLabel') : undefined}>{hero?.breadcrumbLabel}</a>
-        <span aria-hidden="true">/</span>
-        <span data-tina-field={hero ? tinaField(hero, 'eyebrow') : undefined}>{hero?.eyebrow}</span>
-      </nav>
-      <h1 data-tina-field={hero ? tinaField(hero, 'headline') : undefined}>{hero?.headline}</h1>
-      <p data-tina-field={hero ? tinaField(hero, 'lede') : undefined}>{hero?.lede}</p>
+<main class="nx-team-page">
+  <section class="nx-team-hero">
+    <div class="nx-shell nx-team-hero__inner">
+      <nav class="nx-team-crumb" aria-label="Breadcrumb"><a href="/" data-tina-field={hero ? tinaField(hero,'breadcrumbLabel') : undefined}>{hero?.breadcrumbLabel}</a><span>/</span><span data-tina-field={hero ? tinaField(hero,'eyebrow') : undefined}>{hero?.eyebrow}</span></nav>
+      <h1 data-tina-field={hero ? tinaField(hero,'headline') : undefined}>{heroTitle.before}<em>{heroTitle.highlight}</em>{heroTitle.after}</h1>
+      <p data-tina-field={hero ? tinaField(hero,'lede') : undefined}>{hero?.lede}</p>
     </div>
   </section>
 
-  <section class="nx-team-section nx-leadership">
-    <div class="nx-shell">
-      <h2 data-tina-field={leadership ? tinaField(leadership, 'eyebrow') : undefined}>{leadership?.eyebrow}</h2>
-      <div class="nx-leadership__list">
-        {leaders.map((person: any, index: number) => (
-          <article class:list={['nx-leader', { 'nx-leader--reverse': index % 2 === 1 }]}>
-            <img src={person.image} alt={person.imageAlt || ''} data-tina-field={tinaField(person, 'image')} />
-            <div class="nx-leader__copy">
-              <div class="nx-leader__heading">
-                <div>
-                  <h3 data-tina-field={tinaField(person, 'name')}>{person.name}</h3>
-                  <span data-tina-field={tinaField(person, 'location')}>{person.location}</span>
-                </div>
-                <b data-tina-field={tinaField(person, 'role')}>{person.role}</b>
-              </div>
-              <p data-tina-field={tinaField(person, 'bio')}>{person.bio}</p>
-            </div>
-          </article>
-        ))}
-      </div>
+  <section class="nx-shell nx-team-leadership">
+    <p class="nx-team-kicker" data-tina-field={leadership ? tinaField(leadership,'eyebrow') : undefined}>{leadership?.eyebrow}</p>
+    <div class="nx-team-leaders">
+      {leaders.map((person:any) => (
+        <article>
+          <img src={person.image} alt={person.imageAlt || person.name || ''} data-tina-field={tinaField(person,'image')} />
+          <div class="nx-team-person__name"><h2 data-tina-field={tinaField(person,'name')}>{person.name}</h2><span data-tina-field={tinaField(person,'location')}>{person.location}</span></div>
+          <b data-tina-field={tinaField(person,'role')}>{person.role}</b>
+          <p data-tina-field={tinaField(person,'bio')}>{person.bio}</p>
+        </article>
+      ))}
     </div>
   </section>
 
-  <section class="nx-team-section nx-editors">
-    <div class="nx-shell">
-      <h2 data-tina-field={seniorStaff ? tinaField(seniorStaff, 'eyebrow') : undefined}>{seniorStaff?.eyebrow}</h2>
-      <div class="nx-editors__grid">
-        {editors.map((person: any) => (
-          <article class="nx-editor">
-            <img src={person.image} alt={person.imageAlt || ''} data-tina-field={tinaField(person, 'image')} />
-            <div class="nx-editor__heading">
-              <h3 data-tina-field={tinaField(person, 'name')}>{person.name}</h3>
-              <b data-tina-field={tinaField(person, 'role')}>{person.role}</b>
-              <span data-tina-field={tinaField(person, 'location')}>{person.location}</span>
-            </div>
-            <p data-tina-field={tinaField(person, 'bio')}>{person.bio}</p>
-          </article>
-        ))}
-      </div>
+  <section class="nx-shell nx-team-editors">
+    <p class="nx-team-kicker" data-tina-field={seniorStaff ? tinaField(seniorStaff,'eyebrow') : undefined}>{seniorStaff?.eyebrow}</p>
+    <div class="nx-team-editors__grid">
+      {editors.map((person:any) => (
+        <article>
+          <img src={person.image} alt={person.imageAlt || person.name || ''} data-tina-field={tinaField(person,'image')} />
+          <div>
+            <h3 data-tina-field={tinaField(person,'name')}>{person.name}</h3>
+            <div class="nx-team-editor__meta"><b data-tina-field={tinaField(person,'role')}>{person.role}</b><span data-tina-field={tinaField(person,'location')}>{person.location}</span></div>
+            <p data-tina-field={tinaField(person,'bio')}>{person.bio}</p>
+          </div>
+        </article>
+      ))}
     </div>
   </section>
 
@@ -70,6 +59,6 @@ const editors = Array.isArray(seniorStaff?.people) ? seniorStaff.people : [];
 </main>
 
 <style>
-  .nx-info{color:#0f1e33;background:#fff}.nx-info :global(h1),.nx-info :global(h2),.nx-info :global(h3),.nx-info :global(p){margin-top:0}.nx-info-hero{background:#0f1e33;color:#fff}.nx-info-hero__inner{padding-top:clamp(56px,8vw,112px);padding-bottom:clamp(56px,7vw,96px)}.nx-crumbs{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#ffffffb3}.nx-crumbs a{color:#ffffffb3}.nx-info-hero h1{max-width:1120px;margin:clamp(26px,4vw,48px) 0 24px;font-size:clamp(58px,10vw,144px);font-weight:900;font-stretch:72%;line-height:.85;letter-spacing:-.035em;text-transform:uppercase}.nx-info-hero p{max-width:830px;margin-bottom:0;font-size:clamp(18px,2vw,25px);line-height:1.55;color:#ffffffd9}.nx-team-section{padding:clamp(56px,8vw,112px) 0}.nx-team-section h2{margin:0 0 clamp(38px,6vw,72px);font-size:clamp(42px,6vw,84px);font-weight:900;font-stretch:72%;line-height:.9;letter-spacing:-.025em;text-transform:uppercase}.nx-leadership__list{border-top:2px solid #0f1e33}.nx-leader{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(420px,1.2fr);gap:clamp(32px,6vw,88px);align-items:center;padding:clamp(40px,6vw,80px) 0;border-bottom:1px solid #ccd3dc}.nx-leader--reverse img{grid-column:2}.nx-leader--reverse .nx-leader__copy{grid-column:1;grid-row:1}.nx-leader img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:20px;background:#eaf4fd}.nx-leader__heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-bottom:20px;margin-bottom:24px;border-bottom:2px solid #0f1e33}.nx-leader h3{margin-bottom:3px;font-size:clamp(32px,4vw,56px);font-weight:900;font-stretch:75%;line-height:.95;text-transform:uppercase}.nx-leader__heading span{color:#5b6b82;font-size:15px}.nx-leader__heading b{flex:none;background:#0b7bdb;color:#fff;padding:8px 13px;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.nx-leader__copy>p{margin-bottom:0;font-size:18px;line-height:1.75}.nx-editors{background:#eaf4fd}.nx-editors__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(48px,6vw,80px) clamp(30px,5vw,64px)}.nx-editor img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:20px;background:#fff}.nx-editor__heading{display:grid;grid-template-columns:1fr auto;gap:3px 16px;align-items:start;padding:22px 0 18px;border-bottom:2px solid #0f1e33}.nx-editor h3{margin-bottom:0;font-size:clamp(27px,3vw,38px);font-weight:900;font-stretch:75%;line-height:1;text-transform:uppercase}.nx-editor b{color:#0b7bdb;font-size:13px;text-transform:uppercase;letter-spacing:.06em}.nx-editor span{grid-column:1;color:#5b6b82;font-size:14px}.nx-editor>p{margin:18px 0 0;font-size:16px;line-height:1.7}
-  @media(max-width:760px){.nx-info-hero__inner{padding-top:52px;padding-bottom:58px}.nx-info-hero h1{font-size:clamp(54px,18vw,74px);margin-top:30px}.nx-info-hero p{font-size:17px}.nx-team-section h2{font-size:46px}.nx-leader,.nx-editors__grid{grid-template-columns:1fr}.nx-leader{gap:26px}.nx-leader--reverse img,.nx-leader--reverse .nx-leader__copy{grid-column:1;grid-row:auto}.nx-leader__heading{align-items:flex-start;flex-direction:column}.nx-leader__copy>p{font-size:16px}.nx-editors__grid{gap:52px}.nx-editor img{aspect-ratio:1}.nx-editor>p{font-size:15px}}
+  .nx-team-page{background:#fff;color:#0f1e33}.nx-team-page :global(.nx-shell){max-width:1296px}.nx-team-page :global(h1),.nx-team-page :global(h2),.nx-team-page :global(h3),.nx-team-page :global(p){margin-top:0}.nx-team-hero{background:#0f1e33;color:#fff}.nx-team-hero__inner{padding-top:115px;padding-bottom:127px}.nx-team-crumb{display:flex;gap:12px;color:#aeb8c5;font-size:14px;font-weight:600}.nx-team-crumb a{color:#aeb8c5}.nx-team-crumb span:last-child{color:#fff}.nx-team-hero h1{margin:35px 0 28px;color:#fff!important;font-size:clamp(62px,8vw,112px);font-weight:900;font-stretch:62%;line-height:.86;letter-spacing:-.045em;text-transform:uppercase}.nx-team-hero h1 em{color:#1fd1d1;font-style:normal}.nx-team-hero p{max-width:900px;margin-bottom:0;font-size:clamp(21px,2vw,28px);font-weight:800;line-height:1.35}.nx-team-kicker{margin:0 0 34px;color:#0b7bdb;font-size:14px;font-weight:800;letter-spacing:.12em;text-transform:uppercase}.nx-team-leadership{padding-top:92px;padding-bottom:96px}.nx-team-leaders{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(30px,4vw,60px)}.nx-team-leaders article img{width:100%;aspect-ratio:500/490;object-fit:cover;border-radius:20px;margin-bottom:25px}.nx-team-person__name{display:flex;justify-content:space-between;align-items:baseline;gap:16px}.nx-team-person__name h2{margin:0;font-size:clamp(34px,3.5vw,51px);font-weight:900;font-stretch:64%;line-height:.95;text-transform:uppercase}.nx-team-person__name span{flex:none;color:#60708a;font-size:14px;font-weight:600}.nx-team-leaders article>b{display:inline-block;margin-top:17px;border-radius:999px;background:#0b7bdb;padding:8px 15px;color:#fff;font-size:13px;line-height:1.5;letter-spacing:.08em;text-transform:uppercase}.nx-team-leaders article>p{margin:23px 0 0;color:#33415a;font-size:17px;line-height:1.7}.nx-team-editors{padding-bottom:100px}.nx-team-editors__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:70px 68px}.nx-team-editors article{display:grid;grid-template-columns:150px 1fr;gap:24px;align-items:start}.nx-team-editors article>img{width:150px;height:150px;border-radius:50%;object-fit:cover}.nx-team-editors h3{margin:3px 0 10px;font-size:35px;font-weight:900;font-stretch:64%;line-height:1;text-transform:uppercase}.nx-team-editor__meta{display:flex;gap:18px;align-items:baseline}.nx-team-editor__meta b{color:#0b7bdb;font-size:14px;letter-spacing:.09em;text-transform:uppercase}.nx-team-editor__meta span{color:#60708a;font-size:14px;font-weight:600}.nx-team-editors article p{margin:18px 0 0;color:#33415a;font-size:18px;line-height:1.68}
+  @media(max-width:760px){.nx-team-hero__inner{padding-top:59px;padding-bottom:56px}.nx-team-hero h1{margin:26px 0 27px;font-size:47px;line-height:.9}.nx-team-hero p{font-size:23px;line-height:1.24}.nx-team-leadership{padding-top:57px;padding-bottom:71px}.nx-team-kicker{margin-bottom:31px}.nx-team-leaders{grid-template-columns:1fr;gap:44px}.nx-team-leaders article img{aspect-ratio:358/350;margin-bottom:20px}.nx-team-person__name{align-items:baseline}.nx-team-person__name h2{font-size:35px}.nx-team-person__name span{font-size:14px}.nx-team-leaders article>b{margin-top:16px}.nx-team-leaders article>p{margin-top:22px;font-size:18px;line-height:1.7}.nx-team-editors{padding-bottom:61px}.nx-team-editors__grid{grid-template-columns:1fr;gap:60px}.nx-team-editors article{display:block}.nx-team-editors article>img{width:96px;height:96px;margin-bottom:20px}.nx-team-editors h3{font-size:28px;margin-bottom:10px}.nx-team-editor__meta{gap:17px}.nx-team-editors article p{font-size:18px;line-height:1.7;margin-top:16px}}
 </style>

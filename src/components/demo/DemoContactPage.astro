@@ -12,6 +12,12 @@ const inboxCards = Array.isArray(inboxes?.cards) ? inboxes.cards : [];
 const requestCards = Array.isArray(requests?.cards) ? requests.cards : [];
 const formAction = config?.contactForm?.formspreeEndpoint || formSection.formAction || '';
 const formConfigured = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9_-]+$/.test(formAction);
+const linkedRequestText = (value = '') => {
+  const escaped = value.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+  return escaped
+    .replace(/([A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,})/gi, '<a href="mailto:$1">$1</a>')
+    .replace(/\b(DMCA Policy)\b/g, '<a href="/dmca-policy/">$1</a>');
+};
 ---
 
 <main class="nx-contact">
@@ -77,7 +83,7 @@ const formConfigured = /^https:\/\/formspree\.io\/f\/[A-Za-z0-9_-]+$/.test(formA
         <article>
           <span data-tina-field={tinaField(card, 'number')}>{card.number}</span>
           <h3 data-tina-field={tinaField(card, 'title')}>{card.title}</h3>
-          <p data-tina-field={tinaField(card, 'text')}>{card.text}</p>
+          <p data-tina-field={tinaField(card, 'text')} set:html={linkedRequestText(card.text)} />
         </article>
       ))}
     </div>

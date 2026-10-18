@@ -72,6 +72,7 @@ export const CategoryPartsFragmentDoc = gql`
   __typename
   title
   description
+  latestLabel
   seo {
     __typename
     metaTitle
@@ -109,6 +110,7 @@ export const PagePartsFragmentDoc = gql`
         __typename
         eyebrow
         title
+        accentTitle
         description
         buttonText
         buttonLink
@@ -132,6 +134,7 @@ export const PagePartsFragmentDoc = gql`
         __typename
         heading
         subheading
+        subheadingLink
         submitHeading
         submitButtonText
         submitButtonLink
@@ -140,6 +143,16 @@ export const PagePartsFragmentDoc = gql`
           title
           text
         }
+      }
+      featuredStories {
+        __typename
+        number
+        category
+        title
+        meta
+        image
+        imageAlt
+        link
       }
       wireFeature {
         __typename
@@ -197,7 +210,11 @@ export const PagePartsFragmentDoc = gql`
         breadcrumbLabel
         eyebrow
         headline
+        headlineHighlight
         lede
+        ledeHighlight
+        image
+        imageAlt
       }
       purpose {
         __typename
@@ -248,6 +265,8 @@ export const PagePartsFragmentDoc = gql`
         __typename
         eyebrow
         title
+        image
+        imageAlt
         intro
         paragraphTwo
         contacts {
@@ -265,6 +284,7 @@ export const PagePartsFragmentDoc = gql`
         breadcrumbLabel
         eyebrow
         headline
+        headlineHighlight
         lede
       }
       leadership {

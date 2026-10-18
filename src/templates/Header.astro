@@ -10,8 +10,18 @@ const links = navigation?.items || [];
     <a class="nx-logo" href="/" aria-label={config?.seo?.title || "New Media Xpress"} data-tina-field={editData ? tinaField(editData, "seo.logo") : undefined}>
       <img src={logo} alt={config?.seo?.title || "New Media Xpress"} />
     </a>
-    <nav class="nx-nav" aria-label="Primary navigation" data-tina-field={editData ? tinaField(editData, "headerNavigation") : undefined}>
+    <button class="nx-menu" type="button" aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="nx-primary"><span></span><span></span><span></span></button>
+    <nav id="nx-primary" class="nx-nav" aria-label="Primary navigation" data-tina-field={editData ? tinaField(editData, "headerNavigation") : undefined}>
       {links.map((item: any) => <a href={item.href || item.link || "#"}>{item.label || item.title}</a>)}
     </nav>
   </div>
 </header>
+<script>
+  const button = document.querySelector<HTMLButtonElement>('.nx-menu');
+  const nav = document.querySelector<HTMLElement>('#nx-primary');
+  button?.addEventListener('click', () => {
+    const open = button.getAttribute('aria-expanded') !== 'true';
+    button.setAttribute('aria-expanded', String(open));
+    nav?.classList.toggle('is-open', open);
+  });
+</script>
