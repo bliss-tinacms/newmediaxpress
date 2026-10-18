@@ -58,6 +58,18 @@ export const GlobalConfigCollection: Collection = {
       ],
     },
     {
+      name: "globalText",
+      label: "Global Display Text",
+      type: "object",
+      fields: [
+        { name: "ctaHeading", label: "CTA Heading", type: "string" },
+        { name: "ctaButtonText", label: "CTA Button Text", type: "string" },
+        { name: "ctaButtonLink", label: "CTA Button Link", type: "string" },
+        { name: "footerTagline", label: "Footer Tagline", type: "string" },
+        { name: "copyrightSuffix", label: "Copyright Suffix", type: "string" },
+      ],
+    },
+    {
       name: "contactForm",
       label: "Contact Form",
       type: "object",

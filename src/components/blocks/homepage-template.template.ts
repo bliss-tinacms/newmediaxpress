@@ -69,6 +69,7 @@ export const homepageTemplateBlockSchema = {
             { name: 'quote', label: 'Quote', type: 'string', ui: { component: 'textarea' } },
             { name: 'author', label: 'Author Name', type: 'string' },
             { name: 'byline', label: 'Byline', type: 'string' },
+            { name: 'avatar', label: 'Author Avatar', type: 'image' },
             { name: 'image', label: 'Feature Image', type: 'image' },
             { name: 'imageAlt', label: 'Feature Image Alt Text', type: 'string' },
           ],
@@ -78,6 +79,7 @@ export const homepageTemplateBlockSchema = {
           name: 'coverage',
           label: 'What We Cover Section',
           fields: [
+            { name: 'eyebrow', label: 'Eyebrow', type: 'string' },
             { name: 'title', label: 'Heading', type: 'string' },
             { name: 'description', label: 'Description', type: 'string', ui: { component: 'textarea' } },
             {
@@ -89,6 +91,28 @@ export const homepageTemplateBlockSchema = {
                 { name: 'number', label: 'Number', type: 'string' },
                 { name: 'title', label: 'Topic Title', type: 'string' },
                 { name: 'text', label: 'Topic Text', type: 'string', ui: { component: 'textarea' } },
+                { name: 'image', label: 'Topic Image', type: 'image' },
+                { name: 'link', label: 'Topic Link', type: 'string' },
+              ],
+            },
+          ],
+        },
+        {
+          type: 'object',
+          name: 'values',
+          label: 'Editorial Values Section',
+          fields: [
+            { name: 'eyebrow', label: 'Eyebrow', type: 'string' },
+            { name: 'title', label: 'Heading', type: 'string' },
+            {
+              type: 'object',
+              list: true,
+              name: 'items',
+              label: 'Values',
+              fields: [
+                { name: 'number', label: 'Number', type: 'string' },
+                { name: 'title', label: 'Title', type: 'string' },
+                { name: 'text', label: 'Text', type: 'string', ui: { component: 'textarea' } },
               ],
             },
           ],

@@ -16,6 +16,7 @@ fragment BlogParts on Blog {
     nofollow
   }
   pubDate
+  readingTime
   updatedDate
   categories
   author {
@@ -23,6 +24,7 @@ fragment BlogParts on Blog {
       __typename
       name
       role
+      latestLabel
       avatar
       bio
       email
@@ -135,14 +137,29 @@ fragment PageParts on Page {
         quote
         author
         byline
+        avatar
         image
         imageAlt
       }
       coverage {
         __typename
+        eyebrow
         title
         description
         topics {
+          __typename
+          number
+          title
+          text
+          image
+          link
+        }
+      }
+      values {
+        __typename
+        eyebrow
+        title
+        items {
           __typename
           number
           title
@@ -401,6 +418,7 @@ fragment UserParts on User {
   __typename
   name
   role
+  latestLabel
   avatar
   bio
   email
@@ -499,6 +517,14 @@ fragment ConfigParts on Config {
     logo
     favicon
     footerLogo
+  }
+  globalText {
+    __typename
+    ctaHeading
+    ctaButtonText
+    ctaButtonLink
+    footerTagline
+    copyrightSuffix
   }
   contactForm {
     __typename

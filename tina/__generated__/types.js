@@ -24,6 +24,7 @@ export const BlogPartsFragmentDoc = gql`
     nofollow
   }
   pubDate
+  readingTime
   updatedDate
   categories
   author {
@@ -31,6 +32,7 @@ export const BlogPartsFragmentDoc = gql`
       __typename
       name
       role
+      latestLabel
       avatar
       bio
       email
@@ -145,14 +147,29 @@ export const PagePartsFragmentDoc = gql`
         quote
         author
         byline
+        avatar
         image
         imageAlt
       }
       coverage {
         __typename
+        eyebrow
         title
         description
         topics {
+          __typename
+          number
+          title
+          text
+          image
+          link
+        }
+      }
+      values {
+        __typename
+        eyebrow
+        title
+        items {
           __typename
           number
           title
@@ -412,6 +429,7 @@ export const UserPartsFragmentDoc = gql`
   __typename
   name
   role
+  latestLabel
   avatar
   bio
   email
@@ -512,6 +530,14 @@ export const ConfigPartsFragmentDoc = gql`
     logo
     favicon
     footerLogo
+  }
+  globalText {
+    __typename
+    ctaHeading
+    ctaButtonText
+    ctaButtonLink
+    footerTagline
+    copyrightSuffix
   }
   contactForm {
     __typename

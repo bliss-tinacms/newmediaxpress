@@ -1,25 +1,18 @@
 {
-  "title": "Footer Menu",
+  "title": "Footer Navigation",
   "items": [
-    {
-      "label": "Home",
-      "href": "/"
-    },
-    {
-      "label": "About Us",
-      "href": "/about/"
-    },
-    {
-      "label": "Our Team",
-      "href": "/our-team/"
-    },
-    {
-      "label": "Contact Us",
-      "href": "/contact/"
-    },
-    {
-      "label": "Blog",
-      "href": "/blog/"
-    }
+    { "label": "Home", "href": "/" },
+    { "label": "About Us", "href": "/about/" },
+    { "label": "Our Team", "href": "/our-team/" },
+    { "label": "Contact Us", "href": "/contact/" },
+    { "label": "Blog", "href": "/blog/" },
+    { "label": "Write for Us", "href": "/write-for-us/" },
+    { "label": "Privacy", "href": "/privacy-policy/" },
+    { "label": "Terms", "href": "/terms-of-use/" },
+    { "label": "Cookie", "href": "/cookie-policy/" },
+    { "label": "AI", "href": "/ai-policy/" },
+    { "label": "DMCA", "href": "/dmca-policy/" },
+    { "label": "Sponsored", "href": "/sponsored-content-policy/" },
+    { "label": "Sitemap", "href": "/sitemap/" }
   ]
 }

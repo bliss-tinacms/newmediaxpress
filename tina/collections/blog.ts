@@ -77,7 +77,8 @@ export const BlogCollection: Collection = {
 
     { name: "description", label: "Description", type: "string" },
     seoFields,
-    { name: "pubDate", label: "Publication Date", type: "datetime" },
+    { name: "pubDate", label: "Publish Date", type: "datetime", required: true },
+    { name: "readingTime", label: "Reading Time", type: "string", description: "Visible label such as 6 min read" },
     { name: "updatedDate", label: "Updated Date", type: "datetime" },
     {
       label: "Categories",

@@ -23,6 +23,12 @@ export const UserCollection: Collection = {
       type: "string",
       name: "role",
       label: "Role / Title",
+      required: true,
+    },
+    {
+      type: "string",
+      name: "latestLabel",
+      label: "Latest Story Label",
     },
     {
       type: "image",

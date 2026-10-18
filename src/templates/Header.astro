@@ -1,48 +1,17 @@
 ---
-import { tinaField } from "@tinacms/astro/tina-field";
-import type { CmsConfig } from '../lib/data';
-
-interface Props {
-  config?: CmsConfig | null;
-  navigation?: NavigationDocument | null;
-}
-
-type NavItem = {
-  label?: string | null;
-  href?: string | null;
-  children?: (NavItem | null)[] | null;
-};
-
-type NavigationDocument = {
-  title?: string | null;
-  items?: (NavItem | null)[] | null;
-};
-
-const { config, navigation } = Astro.props;
-const seo = config?.seo ?? null;
-const siteTitle = seo?.title || 'Starter Site';
-const logo = seo?.logo || '';
-const menuItems = ((navigation?.items ?? []) as NavItem[]).filter((item) => item && item.label && item.href);
+import { tinaField } from "tinacms/dist/react";
+interface Props { config?: any; navigation?: any; editData?: any; }
+const { config = {}, navigation = {}, editData } = Astro.props;
+const logo = config?.seo?.logo || "/images/newmediaxpress/a0ac5c71a06a9c052d01c6bcff145d8a8523dfc65afeb39dba239bd44db60b90.png";
+const links = navigation?.items || [];
 ---
-
-<header class="mh" data-brand-header>
-  <input class="ntog" id="ntog" type="checkbox" aria-label="Toggle navigation menu" />
-  <div class="w">
-    <div class="mh-in">
-      <a href="/" class="mh-logo-link" aria-label={`${siteTitle} home`}>
-        {logo
-          ? <img src={logo} alt={siteTitle} data-tina-field={seo ? tinaField(seo, 'logo') : undefined} />
-          : <span class="mh-text-logo" data-tina-field={seo ? tinaField(seo, 'title') : undefined}>{siteTitle}</span>}
-      </a>
-      <label class="brg" for="ntog">
-        <span class="brg-b" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span>Menu</span>
-      </label>
-      <nav class="mnav" aria-label={navigation?.title || 'Primary menu'}>
-        {menuItems.map((item) => (
-          <a href={item.href || '#'} data-tina-field={tinaField(item, 'label')}>{item.label}</a>
-        ))}
-      </nav>
-    </div>
+<header class="nx-header">
+  <div class="nx-shell nx-header__inner">
+    <a class="nx-logo" href="/" aria-label={config?.seo?.title || "New Media Xpress"} data-tina-field={editData ? tinaField(editData, "seo.logo") : undefined}>
+      <img src={logo} alt={config?.seo?.title || "New Media Xpress"} />
+    </a>
+    <nav class="nx-nav" aria-label="Primary navigation" data-tina-field={editData ? tinaField(editData, "headerNavigation") : undefined}>
+      {links.map((item: any) => <a href={item.href || item.link || "#"}>{item.label || item.title}</a>)}
+    </nav>
   </div>
 </header>

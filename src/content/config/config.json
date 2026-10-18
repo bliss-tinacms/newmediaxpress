@@ -1,26 +1,37 @@
 {
-  "headerNavigation": "",
-  "footerNavigation": "",
+  "headerNavigation": "src/content/navigation/header.json",
+  "footerNavigation": "src/content/navigation/footer.json",
+  "favicon": "/favicon.svg",
   "seo": {
-    "title": "Starter Site",
-    "description": "A clean Astro and TinaCMS starter ready for your content, brand, and services.",
-    "siteOwner": "Site Owner",
-    "logo": "https://res.cloudinary.com/qwdyyii2/image/upload/v1791209754/boilerplate/favicon.png",
+    "title": "New Media Xpress",
+    "description": "Important stories made clear through careful sourcing and meaningful context.",
+    "siteOwner": "Brian Caldwell",
+    "logo": "/images/newmediaxpress/a0ac5c71a06a9c052d01c6bcff145d8a8523dfc65afeb39dba239bd44db60b90.png",
     "favicon": "/favicon.svg",
-    "footerLogo": ""
+    "footerLogo": "/images/newmediaxpress/a0ac5c71a06a9c052d01c6bcff145d8a8523dfc65afeb39dba239bd44db60b90.png"
+  },
+  "globalText": {
+    "ctaHeading": "Have a story worth telling?",
+    "ctaButtonText": "Write For Us",
+    "ctaButtonLink": "/write-for-us/",
+    "footerTagline": "Clear writing. Careful sourcing. Meaningful context.",
+    "copyrightSuffix": "All rights reserved."
   },
   "contactForm": {
-    "formspreeEndpoint": "",
-    "heading": "Contact us",
-    "description": "Configure a unique Formspree endpoint for this site before enabling submissions.",
+    "formspreeEndpoint": "https://formspree.io/f/xyekvkav",
+    "heading": "Write to the Editors",
+    "description": "Send story tips, corrections, letters, contributor pitches, or general questions.",
     "buttonText": "Send Message",
-    "note": "This form remains disabled until its Formspree endpoint is configured.",
-    "subject": "Starter Site contact form submission"
+    "note": "For sensitive tips, note on-record, background, or off-record terms at the top.",
+    "subject": "New Media Xpress contact form submission"
   },
   "codeInjection": {
     "headerCode": "",
     "footerCode": ""
   },
-  "contactLinks": [],
+  "contactLinks": [
+    { "title": "Editorial", "link": "mailto:editorial@newmediaxpress.com", "icon": "mail" },
+    { "title": "General Inquiries", "link": "mailto:info@newmediaxpress.com", "icon": "mail" }
+  ],
   "footerStarfield": false
 }

@@ -349,7 +349,8 @@ var BlogCollection = {
     { name: "permalink", label: "Permalink", type: "string", description: "Optional custom public URL path. Leave blank to use the filename/slug." },
     { name: "description", label: "Description", type: "string" },
     seoFields,
-    { name: "pubDate", label: "Publication Date", type: "datetime" },
+    { name: "pubDate", label: "Publish Date", type: "datetime", required: true },
+    { name: "readingTime", label: "Reading Time", type: "string", description: "Visible label such as 6 min read" },
     { name: "updatedDate", label: "Updated Date", type: "datetime" },
     {
       label: "Categories",
@@ -455,6 +456,18 @@ var GlobalConfigCollection = {
           type: "image",
           description: "Upload the logo used in the footer. Falls back to the header logo when empty."
         }
+      ]
+    },
+    {
+      name: "globalText",
+      label: "Global Display Text",
+      type: "object",
+      fields: [
+        { name: "ctaHeading", label: "CTA Heading", type: "string" },
+        { name: "ctaButtonText", label: "CTA Button Text", type: "string" },
+        { name: "ctaButtonLink", label: "CTA Button Link", type: "string" },
+        { name: "footerTagline", label: "Footer Tagline", type: "string" },
+        { name: "copyrightSuffix", label: "Copyright Suffix", type: "string" }
       ]
     },
     {
@@ -1069,6 +1082,7 @@ var homepageTemplateBlockSchema = {
         { name: "quote", label: "Quote", type: "string", ui: { component: "textarea" } },
         { name: "author", label: "Author Name", type: "string" },
         { name: "byline", label: "Byline", type: "string" },
+        { name: "avatar", label: "Author Avatar", type: "image" },
         { name: "image", label: "Feature Image", type: "image" },
         { name: "imageAlt", label: "Feature Image Alt Text", type: "string" }
       ]
@@ -1078,6 +1092,7 @@ var homepageTemplateBlockSchema = {
       name: "coverage",
       label: "What We Cover Section",
       fields: [
+        { name: "eyebrow", label: "Eyebrow", type: "string" },
         { name: "title", label: "Heading", type: "string" },
         { name: "description", label: "Description", type: "string", ui: { component: "textarea" } },
         {
@@ -1088,7 +1103,29 @@ var homepageTemplateBlockSchema = {
           fields: [
             { name: "number", label: "Number", type: "string" },
             { name: "title", label: "Topic Title", type: "string" },
-            { name: "text", label: "Topic Text", type: "string", ui: { component: "textarea" } }
+            { name: "text", label: "Topic Text", type: "string", ui: { component: "textarea" } },
+            { name: "image", label: "Topic Image", type: "image" },
+            { name: "link", label: "Topic Link", type: "string" }
+          ]
+        }
+      ]
+    },
+    {
+      type: "object",
+      name: "values",
+      label: "Editorial Values Section",
+      fields: [
+        { name: "eyebrow", label: "Eyebrow", type: "string" },
+        { name: "title", label: "Heading", type: "string" },
+        {
+          type: "object",
+          list: true,
+          name: "items",
+          label: "Values",
+          fields: [
+            { name: "number", label: "Number", type: "string" },
+            { name: "title", label: "Title", type: "string" },
+            { name: "text", label: "Text", type: "string", ui: { component: "textarea" } }
           ]
         }
       ]
@@ -1253,7 +1290,13 @@ var UserCollection = {
     {
       type: "string",
       name: "role",
-      label: "Role / Title"
+      label: "Role / Title",
+      required: true
+    },
+    {
+      type: "string",
+      name: "latestLabel",
+      label: "Latest Story Label"
     },
     {
       type: "image",

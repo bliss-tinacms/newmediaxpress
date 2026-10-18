@@ -312,6 +312,7 @@ export async function getConfig() {
 			headerNavigation { ... on Navigation { _sys { relativePath } } }
 			footerNavigation { ... on Navigation { _sys { relativePath } } }
 			seo { title description siteOwner logo favicon footerLogo }
+			globalText { ctaHeading ctaButtonText ctaButtonLink footerTagline copyrightSuffix }
 			contactForm { formspreeEndpoint heading description buttonText note subject }
 			codeInjection { headerCode footerCode }
 			contactLinks { title link icon }

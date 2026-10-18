@@ -1,24 +1,19 @@
 ---
-import { tinaField } from '@tinacms/astro/tina-field';
-import { getBlogPermalink } from '../../lib/permalinks';
-import { labelFromReference, getPostCategories } from './DemoHelpers';
-const { archiveTitle = 'Author', author = null, posts = [], currentPage = 1, totalPages = 1, basePath = '/author' } = Astro.props;
-function postUrl(post: any) { const url = getBlogPermalink(post); return url.endsWith('/') ? url : url + '/'; }
-function pagePath(page: number) { return page <= 1 ? basePath + '/' : basePath + '/page/' + page + '/'; }
-const bio = author?.bio || `${archiveTitle} writes and edits coverage for Starter Site.`;
-const avatar = author?.avatar || '';
-const role = author?.role || '';
+import { tinaField } from "tinacms/dist/react";
+import CTA from "../../templates/CTA.astro";
+interface Props { archiveTitle: string; author?: any; editData?: any; posts?: any[]; currentPage?: number; totalPages?: number; basePath?: string; }
+const { archiveTitle, author = {}, editData, posts = [], currentPage = 1, totalPages = 1, basePath = "" } = Astro.props;
+const href = (p:any) => `/blog/${p.permalink || p._sys?.filename || ""}/`;
+const formatDate = (v:any) => v ? new Date(v).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : "";
+const lead = posts[0]; const rest = posts.slice(1);
+const pageUrl = (n:number) => n <= 1 ? `${basePath}/` : `${basePath}/page/${n}/`;
 ---
-
-<main class="ffn-demo ffn-demo-author">
-  <header class="ah"><div class="w"><div class="ah-in">
-    {avatar ? <img class="ah-img" src={avatar} alt={archiveTitle} data-tina-field={author ? tinaField(author, 'avatar') : undefined} /> : <div class="ah-img demo-img"></div>}
-    <div><div class="ah-k"><b>Author</b></div><h1 data-tina-field={author ? tinaField(author, 'name') : undefined}>{archiveTitle}</h1>{role && <div class="ah-r" data-tina-field={author ? tinaField(author, 'role') : undefined}>{role}</div>}<p class="ah-b" data-tina-field={author ? tinaField(author, 'bio') : undefined}>{bio}</p></div>
-  </div></div></header>
-  <section class="lg"><div class="w"><div class="lg-h"><div class="eye"><i></i><span>Most recent first</span></div><div class="h2">Stories by {archiveTitle}</div></div>
-    <div>
-      {posts.map((post: any) => <a href={postUrl(post)} class="si">{post.heroImage ? <img class="si-img" src={post.heroImage} alt="" /> : <div class="si-img demo-img"></div>}<div><div class="si-k">{labelFromReference(getPostCategories(post))}</div><div class="si-h">{post.title}</div>{post.description && <p class="si-x">{post.description}</p>}</div></a>)}
-    </div>
+<main class="nx-author">
+  <section class="nx-author-hero"><div class="nx-shell nx-author-hero__inner">
+    {author?.avatar && <img src={author.avatar} alt={archiveTitle} data-tina-field={editData ? tinaField(editData,"avatar") : undefined}/>}<div><span>{author?.role}</span><h1 data-tina-field={editData ? tinaField(editData,"name") : undefined}>{archiveTitle}</h1>{author?.bio && <p data-tina-field={editData ? tinaField(editData,"bio") : undefined}>{author.bio}</p>}</div>
   </div></section>
-  {totalPages > 1 && <nav class="pg" aria-label="Archive pagination"><div class="w"><a class="nx" href={pagePath(Math.max(1,currentPage-1))}>Prev</a>{Array.from({ length: Math.min(totalPages, 3) }).map((_, i) => { const p=i+1; return <a class={p===currentPage?'on':''} href={pagePath(p)}>{p}</a>; })}<span class="gap">…</span><a class="nx" href={pagePath(Math.min(totalPages,currentPage+1))}>Next →</a></div></nav>}
+  {lead && <section class="nx-shell nx-lead-story"><a href={href(lead)}><img src={lead.heroImage} alt={lead.heroImageAlt || ""}/><span class="nx-lead-story__copy"><small>{author.latestLabel}</small><strong>{lead.title}</strong><em>{lead.description}</em><span class="nx-byline"><b>{archiveTitle}</b><i>·</i>{formatDate(lead.pubDate)}<i>·</i>{lead.readingTime}</span></span></a></section>}
+  {rest.length > 0 && <section class="nx-shell nx-archive-grid">{rest.map((post:any)=><a class="nx-archive-card" href={href(post)}><img src={post.heroImage} alt={post.heroImageAlt || ""}/><strong>{post.title}</strong><p>{post.description}</p><span>{formatDate(post.pubDate)} <i>·</i> {post.readingTime}</span></a>)}</section>}
+  {totalPages > 1 && <nav class="nx-pagination"><a href={pageUrl(currentPage-1)}>← Previous</a><span>{currentPage} / {totalPages}</span><a href={pageUrl(currentPage+1)}>Next →</a></nav>}
+  <CTA />
 </main>

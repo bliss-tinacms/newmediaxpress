@@ -7,6 +7,7 @@ import { tinaField } from '@tinacms/astro/tina-field';
 import type { CmsBlog } from '../../lib/data';
 import FormattedDate from '../FormattedDate.astro';
 import { mdxComponents } from '../mdx/components';
+import CTA from '../../templates/CTA.astro';
 
 interface Props {
 	data?: CmsBlog | null;
@@ -221,7 +222,7 @@ const heroImageAlt = (() => {
 						<div class="rc-t">Share this story</div>
 						<div class="sh">
 							<a href={shareUrl} data-copy-link aria-label="Copy this post URL"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M10 13a5 5 0 0 0 7.07 0l2.83-2.83a5 5 0 0 0-7.07-7.07L11 4.93"></path><path d="M14 11a5 5 0 0 0-7.07 0L4.1 13.83a5 5 0 0 0 7.07 7.07L13 19.07"></path></svg><span>Copy Link</span></a>
-							<a href="mailto:hello@example.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg><span>Email Us</span></a>
+							<a href="mailto:editorial@newmediaxpress.com"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v12H4z"></path><path d="m4 7 8 6 8-6"></path></svg><span>Email Us</span></a>
 							<a href="/contact"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 6h14v10H8l-3 3z"></path></svg><span>Send a Tip</span></a>
 						</div>
 					</div>
@@ -229,7 +230,7 @@ const heroImageAlt = (() => {
 						<div class="rc-t">Write for us</div>
 						<div class="rc-b">
 							<a href="/write-for-us" class="rr">
-								<div class="rr-h">Share a news tip, expert insight, or original story idea with the Starter Site editorial team &rarr;</div>
+								<div class="rr-h">Share a news tip, expert insight, or original story idea with the New Media Xpress editorial team &rarr;</div>
 							</a>
 						</div>
 					</div>
@@ -246,7 +247,7 @@ const heroImageAlt = (() => {
 						<div class="corr-t">Published by</div>
 						<div class="corr-b">
 							<strong id="post-author-heading"><a href={authorArchiveUrl}>{authorName}</a></strong>
-							{author?.bio ? ` — ${author.bio}` : ' — Starter Site newsroom contributor.'}
+							{author?.bio ? ` — ${author.bio}` : ' — New Media Xpress newsroom contributor.'}
 						</div>
 					</section>
 				</article>
@@ -312,3 +313,5 @@ const heroImageAlt = (() => {
 		</div>
 	</section>
 )}
+
+{data && <CTA />}

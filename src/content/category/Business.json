@@ -1,5 +1,10 @@
 {
   "title": "Business",
-  "description": "",
-  "seo": {}
+  "description": "Markets, companies, and household economics.",
+  "seo": {
+    "metaTitle": "Business | New Media Xpress",
+    "metaDescription": "Business, markets, companies, and household economics explained clearly.",
+    "noindex": false,
+    "nofollow": false
+  }
 }
