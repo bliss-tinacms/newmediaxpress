@@ -221,11 +221,13 @@ function tinaProxyEndpoints() {
 	// Self-fetching the live domain during page render can deadlock/timeout under cPanel Passenger.
 	// Public pages must still prefer saved Tina backend data over deployed local fallbacks, so
 	// call Tina Cloud directly from SSR using the public client ID + token.
-	const endpoints = [
-		process.env.TINA_UPSTREAM_CONTENT_API_URL,
+	const direct = tinaDirectContentApiUrl();
+	const clientId = import.meta.env.NEXT_PUBLIC_TINA_CLIENT_ID || process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
+	const inherited = [
 		process.env.TINA_DIRECT_CONTENT_API_URL,
-		tinaDirectContentApiUrl(),
-	].filter(Boolean) as string[];
+		process.env.TINA_UPSTREAM_CONTENT_API_URL,
+	].filter((endpoint): endpoint is string => Boolean(endpoint && clientId && endpoint.includes(clientId)));
+	const endpoints = [direct, ...inherited].filter(Boolean) as string[];
 	return Array.from(new Set(endpoints));
 }
 
