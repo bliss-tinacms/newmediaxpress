@@ -38,23 +38,37 @@ type SitemapLink = { title: string; url: string };
 type SitemapPostLink = SitemapLink & { date: Date | null };
 
 const sitemapPageOrder = ['/', '/about/', '/our-team/', '/contact/', '/blog/', '/write-for-us/'];
-const pageLinks: SitemapLink[] = (pages as any[])
-  .filter((page: any) => !isHiddenPage(page))
-  .map((page: any): SitemapLink => ({
-    title: cleanTitle(page.title || page.seoTitle || page.seo?.metaTitle, page?._sys?.filename || content.fallbackPageTitle),
-    url: pageUrl(page),
-  }))
-  .filter((item: SitemapLink) => sitemapPageOrder.includes(item.url))
-  .sort((a: SitemapLink, b: SitemapLink) => sitemapPageOrder.indexOf(a.url) - sitemapPageOrder.indexOf(b.url));
+const systemPageLinks: SitemapLink[] = [{ title: 'Blog', url: '/blog/' }];
+function comparePageLinks(a: SitemapLink, b: SitemapLink) {
+  const aPriority = sitemapPageOrder.indexOf(a.url);
+  const bPriority = sitemapPageOrder.indexOf(b.url);
+  if (aPriority >= 0 || bPriority >= 0) {
+    if (aPriority < 0) return 1;
+    if (bPriority < 0) return -1;
+    return aPriority - bPriority;
+  }
+  return a.title.localeCompare(b.title, 'en', { sensitivity: 'base' });
+}
+const pageLinks: SitemapLink[] = [
+  ...(pages as any[])
+    .filter((page: any) => !isHiddenPage(page))
+    .map((page: any): SitemapLink => ({
+      title: cleanTitle(page.title || page.seoTitle || page.seo?.metaTitle, page?._sys?.filename || content?.fallbackPageTitle || 'Page'),
+      url: pageUrl(page),
+    })),
+  ...systemPageLinks,
+]
+  .filter((item: SitemapLink, index: number, items: SitemapLink[]) => items.findIndex((candidate) => candidate.url === item.url) === index)
+  .sort(comparePageLinks);
 const postLinks: SitemapPostLink[] = (posts as any[])
   .filter((post: any) => !isHiddenPost(post))
   .map((post: any): SitemapPostLink => ({
-    title: cleanTitle(post.title || post.seo?.metaTitle, post?._sys?.filename || content.fallbackPostTitle),
+    title: cleanTitle(post.title || post.seo?.metaTitle, post?._sys?.filename || content?.fallbackPostTitle || 'Post'),
     url: postUrl(post),
     date: post.pubDate ? new Date(post.pubDate) : null,
   }))
-  .sort((a: SitemapPostLink, b: SitemapPostLink) => Number(b.date || 0) - Number(a.date || 0))
-  .slice(0, 4);
+  .filter((item: SitemapPostLink, index: number, items: SitemapPostLink[]) => items.findIndex((candidate) => candidate.url === item.url) === index)
+  .sort((a: SitemapPostLink, b: SitemapPostLink) => Number(b.date || 0) - Number(a.date || 0) || a.title.localeCompare(b.title, 'en', { sensitivity: 'base' }));
 ---
 
 <Base title={title} description={description} ogTitle={title} ogDescription={description} canonicalUrl="/sitemap/">

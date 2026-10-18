@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Verify Starter Site sitemap dynamic data + SEO output.
+"""Verify New Media Xpress sitemap dynamic data + SEO output.
 
 Guard for the /sitemap/ route: compares Tina backend page/post collections to
 live public sitemap DOM and checks SEO/meta output. This prevents the sitemap
@@ -54,6 +54,8 @@ class LinkCollector(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
         self.links: list[tuple[str, str]] = []
+        self.main_links: list[tuple[str, str]] = []
+        self._main_depth = 0
         self._href: str | None = None
         self._text: list[str] = []
         self.meta: dict[str, str] = {}
@@ -62,6 +64,8 @@ class LinkCollector(HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         attr = dict(attrs)
+        if tag == "main":
+            self._main_depth += 1
         if tag == "a" and attr.get("href"):
             self._href = attr["href"]
             self._text = []
@@ -78,10 +82,14 @@ class LinkCollector(HTMLParser):
             text = normalize("".join(self._text))
             if text:
                 self.links.append((self._href, text))
+                if self._main_depth:
+                    self.main_links.append((self._href, text))
             self._href = None
             self._text = []
         if tag == "title":
             self._in_title = False
+        if tag == "main" and self._main_depth:
+            self._main_depth -= 1
 
     def handle_data(self, data):
         if self._href:
@@ -135,41 +143,50 @@ def main() -> int:
     for node in backend_pages:
         filename = node.get("_sys", {}).get("filename") or ""
         url = page_url(node)
-        if filename in {"404", "sitemap"} or url == "/sitemap/" or node.get("seo", {}).get("noindex"):
+        seo = node.get("seo") or {}
+        if filename in {"404", "sitemap"} or url == "/sitemap/" or seo.get("noindex"):
             continue
-        expected_pages.append((url, normalize(node.get("title") or node.get("seo", {}).get("metaTitle") or filename)))
+        expected_pages.append((url, normalize(node.get("title") or seo.get("metaTitle") or filename)))
 
     expected_posts = []
     for node in backend_posts:
-        if node.get("seo", {}).get("noindex"):
+        seo = node.get("seo") or {}
+        if seo.get("noindex"):
             continue
-        expected_posts.append((post_url(node), normalize(node.get("title") or node.get("seo", {}).get("metaTitle") or node.get("_sys", {}).get("filename"))))
+        expected_posts.append((post_url(node), normalize(node.get("title") or seo.get("metaTitle") or node.get("_sys", {}).get("filename"))))
 
     html = requests.get(f"{SITE}/sitemap/?v=sitemap-dynamic-verify", headers={"Cache-Control": "no-cache", "User-Agent": "HermesSitemapVerify"}, timeout=30).text
     parser = LinkCollector()
     parser.feed(html)
-    live_links = {(with_slash(href) if href.startswith("/") else with_slash("/" + href.replace(SITE, "").lstrip("/")), text) for href, text in parser.links if not href.startswith("#")}
+    live_links = {(with_slash(href) if href.startswith("/") else with_slash("/" + href.replace(SITE, "").lstrip("/")), text) for href, text in parser.main_links if not href.startswith("#")}
     live_text = normalize(re.sub(r"<[^>]+>", " ", html))
 
     failures: list[str] = []
-    # Check all pages, and a representative sample of posts to keep output readable.
+    # Every eligible backend document must be represented. Sampling would allow
+    # a capped or stale visitor sitemap to pass.
     for url, text in expected_pages:
         if (url, text) not in live_links:
             failures.append(f"missing page link {url} {text!r}")
-    for url, text in expected_posts[:10]:
+    for url, text in expected_posts:
         if (url, text) not in live_links:
             failures.append(f"missing post link {url} {text!r}")
+    if ("/blog/", "Blog") not in live_links:
+        failures.append("missing public blog archive link /blog/ 'Blog'")
 
-    if "Sitemap | Starter Site" not in normalize(parser.title_text):
+    if "Sitemap | New Media Xpress" not in normalize(parser.title_text):
         failures.append(f"bad <title>: {parser.title_text!r}")
-    if "Browse the public pages and latest reporting published by Starter Site." not in parser.meta.get("description", ""):
+    if "Browse the public webpages and posts published by New Media Xpress." not in parser.meta.get("description", ""):
         failures.append("missing sitemap meta description")
-    if "ffn-demo-sitemap" not in html or "sitemap-panel" not in html or "Big Shoulders Display" not in html:
-        failures.append("missing Starter Site sitemap branding markers")
-    if f">{len(expected_pages)}<" not in html or f">{len(expected_posts)}<" not in html:
-        failures.append("dynamic page/post counts not rendered")
-    if "Tina content collections" not in live_text:
-        failures.append("dynamic source note missing")
+    if "nx-system-sitemap" not in html or "nx-system-sitemap__grid" not in html:
+        failures.append("missing New Media Xpress sitemap branding markers")
+
+    source = Path("src/pages/sitemap.astro").read_text(errors="ignore")
+    if "listPages()" not in source or "listBlogs()" not in source:
+        failures.append("sitemap source does not use shared page/post loaders")
+    if ".slice(" in source or ".filter((item: SitemapLink) => sitemapPageOrder.includes" in source:
+        failures.append("sitemap source still caps or hard-filters public entries")
+    if "/tina-content-proxy" in source:
+        failures.append("sitemap route must not self-fetch the live content proxy")
 
     print("BACKEND_PAGE_COUNT", len(expected_pages))
     print("BACKEND_POST_COUNT", len(expected_posts))

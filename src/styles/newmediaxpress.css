@@ -1,6 +1,4 @@
-@font-face{font-family:ArchivoNX;src:url('/mockup-assets/5e902ab0-e621-493e-b280-9462592ff2b0.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
-@font-face{font-family:ArchivoNX;src:url('/mockup-assets/2b06c65e-5ed2-44a2-ac3c-3a2a4149909e.woff2') format('woff2');font-style:normal;font-weight:500 600;font-display:swap}
-@font-face{font-family:ArchivoNX;src:url('/mockup-assets/bff5bd7d-6855-4359-959e-345a31f81fc3.woff2') format('woff2');font-style:normal;font-weight:700 900;font-display:swap}
+@font-face{font-family:ArchivoNX;src:url('/mockup-assets/archivo-variable-latin.woff2') format('woff2');font-style:normal;font-weight:400 900;font-stretch:62.5% 125%;font-display:swap}
 :root{--nx-ink:#0f1e33;--nx-blue:#0b7bdb;--nx-sky:#eaf4fd;--nx-muted:#5b6b82;--nx-shell:1360px}
 html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--nx-ink);font-family:ArchivoNX,Archivo,Arial,sans-serif;font-size:18px;line-height:1.6}*{box-sizing:border-box}a{text-decoration:none}.nx-shell,.w{width:min(var(--nx-shell),100%);margin-inline:auto;padding-inline:clamp(16px,3vw,32px)}
 .nx-header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:2px solid var(--nx-ink)}.nx-header__inner{min-height:70px;padding-block:14px;display:flex;align-items:center;justify-content:space-between;gap:12px 32px}.nx-logo{display:flex;flex:none}.nx-logo img{height:clamp(30px,3vw,40px);width:auto}.nx-nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 24px;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em}.nx-nav a{color:var(--nx-ink)}.nx-nav a:last-child{color:var(--nx-blue)}
@@ -136,10 +134,11 @@ html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--nx-ink);fo
 }
 @media(prefers-color-scheme:dark){html,body,.nx-header,.nx-home,.nx-home section:not(.nx-about):not(.nx-commitment):not(.nx-cta),.nx-value-grid article{background-color:#fff;color:#0f1e33}.nx-footer,.nx-commitment{background-color:#0f1e33;color:#fff}}
 
-/* The supplied New Media Xpress references use the bundled Barlow display
-   face. global.css also carries legacy demo heading rules for Bitter and Big
-   Shoulders Display; keep those rules from leaking into this site shell. */
-:is(.nx-home,.nx-about-page,.nx-contact,.nx-policy,.nx-system-sitemap,.nx-system-404,.nx-archive-hero,.nx-author-hero,.ah,.bd,.mo) :is(h1,h2,h3,.h2,.rr-h,.mi-t),
+/* The supplied New Media Xpress references use the variable Archivo face at
+   both heavy weights and condensed width-axis settings. global.css carries
+   legacy demo rules for Bitter and Big Shoulders Display; keep those rules
+   from leaking into any New Media Xpress page template. */
+:is(.nx-home,.nx-about-page,.nx-team-page,.nx-contact,.nx-policy,.nx-system-sitemap,.nx-system-404,.nx-archive-hero,.nx-author-hero,.ah,.bd,.mo) :is(h1,h2,h3,h4,h5,h6,.h2,.rr-h,.mi-t),
 .nx-cta h2{
   font-family:ArchivoNX,Archivo,Arial,sans-serif!important;
 }
