@@ -100,8 +100,8 @@ if (matchedPage) {
     const seo = data.seo ?? null;
     view = 'page';
     pageData = data;
-    pageTitle = seo?.metaTitle || data.seoTitle || config?.seo?.title || 'Starter Site';
-    pageDescription = seo?.metaDescription || config?.seo?.description || 'Welcome to Starter Site.';
+    pageTitle = seo?.metaTitle || data.seoTitle || config?.seo?.title || 'New Media Xpress';
+    pageDescription = seo?.metaDescription || config?.seo?.description || 'Important stories made clear through careful sourcing and meaningful context.';
   }
 }
 
@@ -130,8 +130,8 @@ if (view === 'not-found') {
       basePath: '/' + parsed.slug,
       hasPosts: posts.length > 0,
       seo: categorySeo,
-      seoTitle: categorySeo?.metaTitle || archiveTitle + ' Articles | ' + (config?.seo?.title || 'Starter Site'),
-      description: categorySeo?.metaDescription || editableCategory?.description || categoryEntry.data?.description || (allCategoryPosts.length > 0 ? 'Read the latest ' + archiveTitle + ' articles from Starter Site.' : 'Articles in the ' + archiveTitle + ' category will be published soon on Starter Site.'),
+      seoTitle: categorySeo?.metaTitle || archiveTitle + ' Articles | ' + (config?.seo?.title || 'New Media Xpress'),
+      description: categorySeo?.metaDescription || editableCategory?.description || categoryEntry.data?.description || (allCategoryPosts.length > 0 ? 'Read the latest ' + archiveTitle + ' articles from New Media Xpress.' : 'Articles in the ' + archiveTitle + ' category will be published soon on New Media Xpress.'),
     };
   }
 }
@@ -175,14 +175,14 @@ if (view === 'not-found') {
 
 if (view === 'not-found') {
   Astro.response.status = 404;
-  pageTitle = '404 | Page Not Found | Starter Site';
-  pageDescription = 'The page you are looking for may have moved, been removed, or never existed.';
+  pageTitle = config?.systemPages?.notFound?.metaTitle;
+  pageDescription = config?.systemPages?.notFound?.metaDescription;
 }
 ---
 
 {view === 'not-found' && (
   <Base title={pageTitle} description={pageDescription} noindex={true}>
-    <Demo404 posts={allPosts.slice(0, 3)} categories={allCategories} />
+    <Demo404 content={config?.systemPages?.notFound} />
   </Base>
 )}
 
@@ -223,7 +223,7 @@ if (view === 'not-found') {
 {view === 'blog' && blogContext && (
   <BlogPost {...blogContext.layoutProps}>
     <TinaIsland name="blog" wrapper={islands.blog.wrapper} params={{ slug: blogContext.documentSlug }} primary>
-      <BlogBody data={blogContext.data} relatedPosts={blogContext.relatedPosts} />
+      <BlogBody data={blogContext.data} relatedPosts={blogContext.relatedPosts} config={config} />
     </TinaIsland>
   </BlogPost>
 )}

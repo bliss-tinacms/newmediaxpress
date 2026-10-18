@@ -1,55 +1,75 @@
 ---
 import { tinaField } from '@tinacms/astro/tina-field';
+import CTA from '../../templates/CTA.astro';
 
 const { data = null } = Astro.props;
 const block = Array.isArray(data?.blocks) ? data.blocks[0] : data;
-const hero = block?.hero || {};
-const leadership = block?.leadership || {};
-const seniorStaff = block?.seniorStaff || {};
-const people = Array.isArray(leadership?.people) && leadership.people.length ? leadership.people : [
-  { name: 'Site Editor', role: 'Editor', location: 'Remote', image: '/placeholder.jpg', imageAlt: 'Placeholder portrait for the site editor', bio: 'Replace this sample profile with the real editor’s biography, role, location, and photo.', experience: 'Sample profile', focus: 'Replace before launch' },
-];
-const t = (value: unknown, fallback: string) => String(value || fallback);
+const hero = block?.hero;
+const leadership = block?.leadership;
+const seniorStaff = block?.seniorStaff;
+const leaders = Array.isArray(leadership?.people) ? leadership.people : [];
+const editors = Array.isArray(seniorStaff?.people) ? seniorStaff.people : [];
 ---
 
-<main class="ffn-demo ffn-demo-team">
-  <header class="ph"><div class="w"><div class="ph-in">
-    <div class="ph-k"><b data-tina-field={hero ? tinaField(hero, 'eyebrow') : undefined}>{t(hero.eyebrow, 'Our Team')}</b></div>
-    <h1 data-tina-field={hero ? tinaField(hero, 'headline') : undefined}>{t(hero.headline, 'The editors behind the coverage.')}</h1>
-    <p class="ph-d" data-tina-field={hero ? tinaField(hero, 'lede') : undefined}>{t(hero.lede, 'Replace these sample profiles with the people responsible for this site.')}</p>
-  </div></div></header>
-
-  <section class="sc"><div class="w">
-    <div class="eye"><i></i><span data-tina-field={leadership ? tinaField(leadership, 'eyebrow') : undefined}>{t(leadership.eyebrow, 'Editorial leadership')}</span></div>
-    <h2 class="h2" data-tina-field={leadership ? tinaField(leadership, 'title') : undefined}>{t(leadership.title, 'Who runs the newsroom')}</h2>
-    <div class="rs">
-      {people.map((person: any) => (
-        <article class="rsi">
-          {person.image ? <img class="rsi-img" src={person.image} alt={person.imageAlt || person.name || ''} data-tina-field={tinaField(person, 'image')} /> : <div class="rsi-img demo-img"></div>}
-          <div>
-            <div class="rsi-hd">
-              <div class="rsi-n" data-tina-field={tinaField(person, 'name')}>{person.name}</div>
-              <div class="rsi-r" data-tina-field={tinaField(person, 'role')}>{person.role}</div>
-            </div>
-            <p class="rsi-x" data-tina-field={tinaField(person, 'bio')}>{person.bio}</p>
-            <div class="rsi-f"><span data-tina-field={tinaField(person, 'location')}>{person.location}</span><span>{person.experience || 'Editorial desk'}</span><span>{person.focus || 'Daily coverage'}</span></div>
-          </div>
-        </article>
-      ))}
+<main class="nx-info nx-info--team">
+  <section class="nx-info-hero">
+    <div class="nx-shell nx-info-hero__inner">
+      <nav class="nx-crumbs" aria-label="Breadcrumb">
+        <a href="/" data-tina-field={hero ? tinaField(hero, 'breadcrumbLabel') : undefined}>{hero?.breadcrumbLabel}</a>
+        <span aria-hidden="true">/</span>
+        <span data-tina-field={hero ? tinaField(hero, 'eyebrow') : undefined}>{hero?.eyebrow}</span>
+      </nav>
+      <h1 data-tina-field={hero ? tinaField(hero, 'headline') : undefined}>{hero?.headline}</h1>
+      <p data-tina-field={hero ? tinaField(hero, 'lede') : undefined}>{hero?.lede}</p>
     </div>
-  </div></section>
+  </section>
 
-  {Array.isArray(seniorStaff?.people) && seniorStaff.people.length > 0 && (
-    <section class="sc alt"><div class="w">
-      <div class="eye"><i></i><span data-tina-field={tinaField(seniorStaff, 'eyebrow')}>{t(seniorStaff.eyebrow, 'Senior staff')}</span></div>
-      <h2 class="h2" data-tina-field={tinaField(seniorStaff, 'title')}>{t(seniorStaff.title, 'More editors')}</h2>
-      <div class="rs">{seniorStaff.people.map((person: any) => <article class="rsi"><div><div class="rsi-hd"><div class="rsi-n" data-tina-field={tinaField(person, 'name')}>{person.name}</div><div class="rsi-r" data-tina-field={tinaField(person, 'role')}>{person.role}</div></div><p class="rsi-x" data-tina-field={tinaField(person, 'bio')}>{person.bio}</p></div></article>)}</div>
-    </div></section>
-  )}
+  <section class="nx-team-section nx-leadership">
+    <div class="nx-shell">
+      <h2 data-tina-field={leadership ? tinaField(leadership, 'eyebrow') : undefined}>{leadership?.eyebrow}</h2>
+      <div class="nx-leadership__list">
+        {leaders.map((person: any, index: number) => (
+          <article class:list={['nx-leader', { 'nx-leader--reverse': index % 2 === 1 }]}>
+            <img src={person.image} alt={person.imageAlt || ''} data-tina-field={tinaField(person, 'image')} />
+            <div class="nx-leader__copy">
+              <div class="nx-leader__heading">
+                <div>
+                  <h3 data-tina-field={tinaField(person, 'name')}>{person.name}</h3>
+                  <span data-tina-field={tinaField(person, 'location')}>{person.location}</span>
+                </div>
+                <b data-tina-field={tinaField(person, 'role')}>{person.role}</b>
+              </div>
+              <p data-tina-field={tinaField(person, 'bio')}>{person.bio}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
 
-  <section class="cl"><div class="w"><div class="cl-in">
-    <h2>Found an error? Tell an editor.</h2>
-    <p>Corrections and reader concerns are handled by the editorial team responsible for the published coverage.</p>
-    <a class="cl-cta" href="/contact/">Contact Us →</a>
-  </div></div></section>
+  <section class="nx-team-section nx-editors">
+    <div class="nx-shell">
+      <h2 data-tina-field={seniorStaff ? tinaField(seniorStaff, 'eyebrow') : undefined}>{seniorStaff?.eyebrow}</h2>
+      <div class="nx-editors__grid">
+        {editors.map((person: any) => (
+          <article class="nx-editor">
+            <img src={person.image} alt={person.imageAlt || ''} data-tina-field={tinaField(person, 'image')} />
+            <div class="nx-editor__heading">
+              <h3 data-tina-field={tinaField(person, 'name')}>{person.name}</h3>
+              <b data-tina-field={tinaField(person, 'role')}>{person.role}</b>
+              <span data-tina-field={tinaField(person, 'location')}>{person.location}</span>
+            </div>
+            <p data-tina-field={tinaField(person, 'bio')}>{person.bio}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <CTA />
 </main>
+
+<style>
+  .nx-info{color:#0f1e33;background:#fff}.nx-info :global(h1),.nx-info :global(h2),.nx-info :global(h3),.nx-info :global(p){margin-top:0}.nx-info-hero{background:#0f1e33;color:#fff}.nx-info-hero__inner{padding-top:clamp(56px,8vw,112px);padding-bottom:clamp(56px,7vw,96px)}.nx-crumbs{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#ffffffb3}.nx-crumbs a{color:#ffffffb3}.nx-info-hero h1{max-width:1120px;margin:clamp(26px,4vw,48px) 0 24px;font-size:clamp(58px,10vw,144px);font-weight:900;font-stretch:72%;line-height:.85;letter-spacing:-.035em;text-transform:uppercase}.nx-info-hero p{max-width:830px;margin-bottom:0;font-size:clamp(18px,2vw,25px);line-height:1.55;color:#ffffffd9}.nx-team-section{padding:clamp(56px,8vw,112px) 0}.nx-team-section h2{margin:0 0 clamp(38px,6vw,72px);font-size:clamp(42px,6vw,84px);font-weight:900;font-stretch:72%;line-height:.9;letter-spacing:-.025em;text-transform:uppercase}.nx-leadership__list{border-top:2px solid #0f1e33}.nx-leader{display:grid;grid-template-columns:minmax(280px,.8fr) minmax(420px,1.2fr);gap:clamp(32px,6vw,88px);align-items:center;padding:clamp(40px,6vw,80px) 0;border-bottom:1px solid #ccd3dc}.nx-leader--reverse img{grid-column:2}.nx-leader--reverse .nx-leader__copy{grid-column:1;grid-row:1}.nx-leader img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:20px;background:#eaf4fd}.nx-leader__heading{display:flex;align-items:flex-start;justify-content:space-between;gap:20px;padding-bottom:20px;margin-bottom:24px;border-bottom:2px solid #0f1e33}.nx-leader h3{margin-bottom:3px;font-size:clamp(32px,4vw,56px);font-weight:900;font-stretch:75%;line-height:.95;text-transform:uppercase}.nx-leader__heading span{color:#5b6b82;font-size:15px}.nx-leader__heading b{flex:none;background:#0b7bdb;color:#fff;padding:8px 13px;font-size:12px;text-transform:uppercase;letter-spacing:.08em}.nx-leader__copy>p{margin-bottom:0;font-size:18px;line-height:1.75}.nx-editors{background:#eaf4fd}.nx-editors__grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:clamp(48px,6vw,80px) clamp(30px,5vw,64px)}.nx-editor img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:20px;background:#fff}.nx-editor__heading{display:grid;grid-template-columns:1fr auto;gap:3px 16px;align-items:start;padding:22px 0 18px;border-bottom:2px solid #0f1e33}.nx-editor h3{margin-bottom:0;font-size:clamp(27px,3vw,38px);font-weight:900;font-stretch:75%;line-height:1;text-transform:uppercase}.nx-editor b{color:#0b7bdb;font-size:13px;text-transform:uppercase;letter-spacing:.06em}.nx-editor span{grid-column:1;color:#5b6b82;font-size:14px}.nx-editor>p{margin:18px 0 0;font-size:16px;line-height:1.7}
+  @media(max-width:760px){.nx-info-hero__inner{padding-top:52px;padding-bottom:58px}.nx-info-hero h1{font-size:clamp(54px,18vw,74px);margin-top:30px}.nx-info-hero p{font-size:17px}.nx-team-section h2{font-size:46px}.nx-leader,.nx-editors__grid{grid-template-columns:1fr}.nx-leader{gap:26px}.nx-leader--reverse img,.nx-leader--reverse .nx-leader__copy{grid-column:1;grid-row:auto}.nx-leader__heading{align-items:flex-start;flex-direction:column}.nx-leader__copy>p{font-size:16px}.nx-editors__grid{gap:52px}.nx-editor img{aspect-ratio:1}.nx-editor>p{font-size:15px}}
+</style>

@@ -7,6 +7,7 @@ export const aboutMockup17BlockSchema = {
       name: 'hero',
       label: 'Hero Section',
       fields: [
+        { name: 'breadcrumbLabel', label: 'Breadcrumb Home Label', type: 'string' },
         { name: 'eyebrow', label: 'Eyebrow', type: 'string' },
         { name: 'headline', label: 'Headline', type: 'string' },
         { name: 'lede', label: 'Lede', type: 'string', ui: { component: 'textarea' } },
@@ -32,6 +33,7 @@ export const aboutMockup17BlockSchema = {
         { name: 'eyebrow', label: 'Eyebrow', type: 'string' },
         { name: 'title', label: 'Title', type: 'string' },
         { name: 'intro', label: 'Intro', type: 'string', ui: { component: 'textarea' } },
+        { name: 'paragraphTwo', label: 'Paragraph 2', type: 'string', ui: { component: 'textarea' } },
         {
           name: 'items',
           label: 'Coverage Cards',
@@ -90,6 +92,7 @@ export const aboutMockup17BlockSchema = {
         { name: 'eyebrow', label: 'Eyebrow', type: 'string' },
         { name: 'title', label: 'Title', type: 'string' },
         { name: 'intro', label: 'Intro', type: 'string', ui: { component: 'textarea' } },
+        { name: 'paragraphTwo', label: 'Paragraph 2', type: 'string', ui: { component: 'textarea' } },
         {
           name: 'contacts',
           label: 'Contact Cards',

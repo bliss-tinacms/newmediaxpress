@@ -71,11 +71,11 @@ def configured_collections() -> set[str]:
 def query_backend() -> dict:
     query = f"""
     query AllCollectionFullcheck {{
-      blog(relativePath: "hca-warns-that-lost-health-coverage-is-increasing-pressure-on-hospitals.mdx") {{ title description seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
+      blog(relativePath: "why-grocery-prices-stopped-falling-in-september.mdx") {{ title description seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       blogs: blogConnection(first: 100) {{ edges {{ node {{ categories }} }} }}
       page(relativePath: "home.mdx") {{ title seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       category(relativePath: "Business.json") {{ title description seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
-      user(relativePath: "admin.json") {{ name role bio seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
+      user(relativePath: "carol-burke.json") {{ name role bio seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       navigation(relativePath: "header.json") {{ title items {{ label href children {{ label href }} }} _sys {{ filename }} }}
       config(relativePath: "config.json") {{
         headerNavigation {{ ... on Navigation {{ _sys {{ relativePath }} }} }}
@@ -99,6 +99,7 @@ def query_backend() -> dict:
 def fetch_route(path: str) -> dict:
     response = requests.get(f"{SITE}{path}{'&' if '?' in path else '?'}tina-fullcheck={time.time_ns()}", headers={"Cache-Control": "no-cache", "Pragma": "no-cache", "User-Agent": "TINA-FULLCHECK"}, timeout=45)
     response.raise_for_status()
+    response.encoding = "utf-8"
     parser = DocumentParser(); parser.feed(response.text)
     return {"status": response.status_code, "cache": response.headers.get("cf-cache-status"), "html": unescape(response.text), "head": parser}
 
@@ -146,26 +147,26 @@ def main() -> int:
 
     routes = {
         "page": fetch_route("/"),
-        "blog": fetch_route("/hca-warns-that-lost-health-coverage-is-increasing-pressure-on-hospitals/"),
+        "blog": fetch_route("/why-grocery-prices-stopped-falling-in-september/"),
         "category": fetch_route("/business/"),
-        "user": fetch_route("/author/admin/"),
+        "user": fetch_route("/author/carol-burke/"),
     }
     config, page, blog, category, user = data["config"], data["page"], data["blog"], data["category"], data["user"]
-    site_title = config.get("seo", {}).get("title") or "Starter Site"
+    site_title = config.get("seo", {}).get("title") or "New Media Xpress"
     business_post_count = sum(
         1 for edge in (data.get("blogs", {}).get("edges") or [])
         if any(str(value).replace("\\", "/").lower().endswith("/business.json") for value in ((edge.get("node") or {}).get("categories") or []))
     )
     category_description = category.get("description") or (
-        f"Read the latest {category.get('title')} articles from Starter Site."
+        f"Read the latest {category.get('title')} articles from New Media Xpress."
         if business_post_count else
-        f"Articles in the {category.get('title')} category will be published soon on Starter Site."
+        f"Articles in the {category.get('title')} category will be published soon on New Media Xpress."
     )
     seo_results = {
         "page": assert_seo("page", routes["page"], page.get("seo"), page.get("title") or site_title, config.get("seo", {}).get("description") or "", f"{SITE}/", failures),
-        "blog": assert_seo("blog", routes["blog"], blog.get("seo"), blog.get("title") or "", blog.get("description") or "", "/hca-warns-that-lost-health-coverage-is-increasing-pressure-on-hospitals/", failures),
+        "blog": assert_seo("blog", routes["blog"], blog.get("seo"), blog.get("title") or "", blog.get("description") or "", "/why-grocery-prices-stopped-falling-in-september/", failures),
         "category": assert_seo("category", routes["category"], category.get("seo"), f"{category.get('title')} Articles | {site_title}", category_description, "/business/", failures),
-        "user": assert_seo("user", routes["user"], user.get("seo"), f"{user.get('name')} Articles | {site_title}", user.get("bio") or f"Read the latest articles by {user.get('name')} from Starter Site.", "/author/admin/", failures),
+        "user": assert_seo("user", routes["user"], user.get("seo"), f"{user.get('name')} Articles | {site_title}", user.get("bio") or f"Read the latest articles by {user.get('name')} from New Media Xpress.", "/author/carol-burke/", failures),
     }
     assert_text("blog.title", routes["blog"]["html"], blog.get("title") or "", failures)
     assert_text("category.title", routes["category"]["html"], category.get("title") or "", failures)

@@ -39,7 +39,7 @@ const editableAuthor = parsed.slug ? (await getUser(parsed.slug)).data?.user ?? 
 const authorObject = allPosts.find((post) => post.author && typeof post.author === 'object')?.author ?? editableAuthor;
 const archiveTitle = editableAuthor?.name || labelFromReference(authorObject) || 'Author';
 const authorSeo = (editableAuthor as any)?.seo || (authorObject as any)?.seo || null;
-const title = authorSeo?.metaTitle || archiveTitle + ' Articles | ' + (config?.seo?.title || 'Starter Site');
+const title = authorSeo?.metaTitle || archiveTitle + ' Articles | ' + (config?.seo?.title || 'New Media Xpress');
 const description = authorSeo?.metaDescription || editableAuthor?.bio || 'Read the latest articles published by ' + archiveTitle + '.';
 const basePath = '/blog/author/' + parsed.slug;
 ---

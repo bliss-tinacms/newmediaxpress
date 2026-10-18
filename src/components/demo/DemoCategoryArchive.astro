@@ -1,9 +1,10 @@
 ---
 import CTA from "../../templates/CTA.astro";
+import { getBlogPermalink } from '../../lib/permalinks';
 interface Props { archiveTitle: string; category?: any; posts?: any[]; currentPage?: number; totalPages?: number; basePath?: string; showCategoryBadge?: boolean; }
 const { archiveTitle, category = {}, posts = [], currentPage = 1, totalPages = 1, basePath = "" } = Astro.props;
 const slug = (v:any) => String(v || "").toLowerCase().replace(/[^a-z0-9]+/g,"-").replace(/^-|-$/g,"");
-const href = (p:any) => `/blog/${p.permalink || p._sys?.filename || slug(p.title)}/`;
+const href = (p:any) => { const url = getBlogPermalink(p); return url.endsWith('/') ? url : url + '/'; };
 const author = (p:any) => typeof p.author === "object" ? p.author : null;
 const authorName = (p:any) => author(p)?.name || String(p.author || "New Media Xpress").split("/").pop()?.replace(/\.json$/i,"").replace(/-/g," ");
 const formatDate = (v:any) => v ? new Date(v).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : "";

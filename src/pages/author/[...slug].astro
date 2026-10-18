@@ -94,8 +94,8 @@ const authorObject = allPosts.find((post) => post.author && typeof post.author =
 const archiveTitle = editableAuthor?.name || labelFromReference(authorObject) || Astro.props.archiveTitle || 'Author';
 const authorSeo = (editableAuthor as any)?.seo || (authorObject as any)?.seo || null;
 const basePath = '/author/' + parsed.slug;
-const seoTitle = authorSeo?.metaTitle || archiveTitle + ' Articles | ' + (config?.seo?.title || 'Starter Site');
-const description = authorSeo?.metaDescription || editableAuthor?.bio || 'Read the latest articles by ' + archiveTitle + ' from Starter Site.';
+const seoTitle = authorSeo?.metaTitle || archiveTitle + ' Articles | ' + (config?.seo?.title || 'New Media Xpress');
+const description = authorSeo?.metaDescription || editableAuthor?.bio || 'Read the latest articles by ' + archiveTitle + ' from New Media Xpress.';
 ---
 
 <Base

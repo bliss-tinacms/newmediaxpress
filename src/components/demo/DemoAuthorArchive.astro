@@ -1,9 +1,10 @@
 ---
 import { tinaField } from "tinacms/dist/react";
 import CTA from "../../templates/CTA.astro";
+import { getBlogPermalink } from '../../lib/permalinks';
 interface Props { archiveTitle: string; author?: any; editData?: any; posts?: any[]; currentPage?: number; totalPages?: number; basePath?: string; }
 const { archiveTitle, author = {}, editData, posts = [], currentPage = 1, totalPages = 1, basePath = "" } = Astro.props;
-const href = (p:any) => `/blog/${p.permalink || p._sys?.filename || ""}/`;
+const href = (p:any) => { const url = getBlogPermalink(p); return url.endsWith('/') ? url : url + '/'; };
 const formatDate = (v:any) => v ? new Date(v).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}) : "";
 const lead = posts[0]; const rest = posts.slice(1);
 const pageUrl = (n:number) => n <= 1 ? `${basePath}/` : `${basePath}/page/${n}/`;

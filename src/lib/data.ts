@@ -315,6 +315,11 @@ export async function getConfig() {
 			footerNavigation { ... on Navigation { _sys { relativePath } } }
 			seo { title description siteOwner logo favicon footerLogo }
 			globalText { ctaHeading ctaButtonText ctaButtonLink footerTagline copyrightSuffix }
+			articleSettings { standardsEyebrow standardsTitle standardsText standardsButtonText standardsButtonLink }
+			systemPages {
+				notFound { metaTitle metaDescription code heading message buttonText buttonLink }
+				sitemap { metaTitle metaDescription heading pagesHeading postsHeading emptyPagesText emptyPostsText fallbackPageTitle fallbackPostTitle }
+			}
 			contactForm { formspreeEndpoint heading description buttonText note subject }
 			codeInjection { headerCode footerCode }
 			contactLinks { title link icon }
@@ -425,10 +430,10 @@ async function getLivePage(slug: string) {
 			blocks {
 				__typename
 				... on PageBlocksContent { body }
-				... on PageBlocksHomepageTemplate { hero { eyebrow title description buttonText buttonLink image imageAlt } why { eyebrow title paragraphOne paragraphTwo standards { label title text } } newsroom { heading subheading submitHeading submitButtonText submitButtonLink prompts { title text } } wireFeature { eyebrow quote author byline image imageAlt } coverage { title description topics { number title text } } contact { eyebrow title description note cards { title email text accent } } }
+				... on PageBlocksHomepageTemplate { hero { eyebrow title description buttonText buttonLink image imageAlt } why { eyebrow title paragraphOne paragraphTwo standards { label title text } } newsroom { heading subheading submitHeading submitButtonText submitButtonLink prompts { title text } } wireFeature { eyebrow quote author byline avatar image imageAlt } coverage { eyebrow title description topics { number title text image link } } values { eyebrow title items { number title text } } contact { eyebrow title description note cards { title email text accent } } }
 				... on PageBlocksAboutMockup17 { hero { eyebrow headline lede } purpose { eyebrow title paragraphOne pullquote paragraphTwo } coverage { eyebrow title intro items { number title text link } } standardsSection { eyebrow title intro items { number title text } } independence { eyebrow title image imageAlt paragraphOne paragraphTwo buttonText buttonLink } newsroom { eyebrow title intro contacts { icon title email text } } }
 				... on PageBlocksOurTeamMockup17 { hero { eyebrow headline lede } leadership { eyebrow title people { name role location image imageAlt bio } } seniorStaff { eyebrow title } }
-				... on PageBlocksContactMockup17 { hero { eyebrow headline lede } formSection { eyebrow title description buttonText note formAction subject } inboxes { eyebrow title cards { title description email note } } requests { eyebrow title intro cards { icon title text } } }
+				... on PageBlocksContactMockup17 { hero { breadcrumbHome breadcrumbHomeLink breadcrumbSeparator breadcrumbCurrent headlineLead headlineAccent lede } formSection { eyebrow title nameLabel phoneLabel emailLabel messageLabel buttonText note formAction subject } inboxes { cards { title description email note } } requests { cards { number title text } } }
 				... on PageBlocksHero { headline tagline starfield image { src alt } actions { label type icon link } }
 				... on PageBlocksCallout { text url }
 				... on PageBlocksCta { title description actions { label type icon link } }
@@ -628,6 +633,20 @@ export async function listCategories() {
 	if (local) return local;
 	const result = await client.queries.categoryConnection();
 	return (result.data.categoryConnection.edges || []).flatMap((edge) => edge?.node ? [edge.node] : []);
+}
+
+export async function listUsers() {
+	const query = `query UserConnection {
+		userConnection {
+			edges { node { name role avatar bio email _sys { filename } } }
+		}
+	}`;
+	const liveUsers = await fetchLiveTina(query, undefined, (json) => json?.data?.userConnection?.edges);
+	if (Array.isArray(liveUsers)) return liveUsers.flatMap((edge) => edge?.node ? [edge.node] : []);
+	const localUsers = listLocalJson('user');
+	if (localUsers) return localUsers as any[];
+	const result = await client.queries.userConnection();
+	return (result.data.userConnection.edges ?? []).flatMap((edge) => edge?.node ? [edge.node] : []);
 }
 
 export async function listPages() {

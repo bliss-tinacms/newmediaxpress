@@ -17,6 +17,35 @@
     "footerTagline": "Clear writing. Careful sourcing. Meaningful context.",
     "copyrightSuffix": "All rights reserved."
   },
+  "articleSettings": {
+    "standardsEyebrow": "Our Standards",
+    "standardsTitle": "How We Report",
+    "standardsText": "Every story is held to the same standards for accuracy, sourcing, fairness, and corrections.",
+    "standardsButtonText": "Read Our Editorial Guidelines",
+    "standardsButtonLink": "/editorial-guidelines/"
+  },
+  "systemPages": {
+    "notFound": {
+      "metaTitle": "404 | Page Not Found | New Media Xpress",
+      "metaDescription": "The page you are looking for may have moved, been renamed, or no longer exists.",
+      "code": "404",
+      "heading": "Page not found",
+      "message": "The page you are looking for may have moved, been renamed, or no longer exists. Head back to the homepage to keep reading.",
+      "buttonText": "Back to homepage",
+      "buttonLink": "/"
+    },
+    "sitemap": {
+      "metaTitle": "Sitemap | New Media Xpress",
+      "metaDescription": "Browse the public webpages and posts published by New Media Xpress.",
+      "heading": "Sitemap",
+      "pagesHeading": "Webpages",
+      "postsHeading": "Posts",
+      "emptyPagesText": "No public webpages found.",
+      "emptyPostsText": "No published posts found.",
+      "fallbackPageTitle": "Page",
+      "fallbackPostTitle": "Post"
+    }
+  },
   "contactForm": {
     "formspreeEndpoint": "https://formspree.io/f/xyekvkav",
     "heading": "Write to the Editors",

@@ -471,6 +471,55 @@ var GlobalConfigCollection = {
       ]
     },
     {
+      name: "articleSettings",
+      label: "Article Sidebar",
+      type: "object",
+      fields: [
+        { name: "standardsEyebrow", label: "Standards Eyebrow", type: "string" },
+        { name: "standardsTitle", label: "Standards Title", type: "string" },
+        { name: "standardsText", label: "Standards Text", type: "string", ui: { component: "textarea" } },
+        { name: "standardsButtonText", label: "Standards Button Text", type: "string" },
+        { name: "standardsButtonLink", label: "Standards Button Link", type: "string" }
+      ]
+    },
+    {
+      name: "systemPages",
+      label: "System Pages",
+      type: "object",
+      fields: [
+        {
+          name: "notFound",
+          label: "404 Page",
+          type: "object",
+          fields: [
+            { name: "metaTitle", label: "Meta Title", type: "string" },
+            { name: "metaDescription", label: "Meta Description", type: "string", ui: { component: "textarea" } },
+            { name: "code", label: "Error Code", type: "string" },
+            { name: "heading", label: "Heading", type: "string" },
+            { name: "message", label: "Message", type: "string", ui: { component: "textarea" } },
+            { name: "buttonText", label: "Button Text", type: "string" },
+            { name: "buttonLink", label: "Button Link", type: "string" }
+          ]
+        },
+        {
+          name: "sitemap",
+          label: "Sitemap Page",
+          type: "object",
+          fields: [
+            { name: "metaTitle", label: "Meta Title", type: "string" },
+            { name: "metaDescription", label: "Meta Description", type: "string", ui: { component: "textarea" } },
+            { name: "heading", label: "Heading", type: "string" },
+            { name: "pagesHeading", label: "Pages Heading", type: "string" },
+            { name: "postsHeading", label: "Posts Heading", type: "string" },
+            { name: "emptyPagesText", label: "Empty Pages Text", type: "string" },
+            { name: "emptyPostsText", label: "Empty Posts Text", type: "string" },
+            { name: "fallbackPageTitle", label: "Fallback Page Title", type: "string" },
+            { name: "fallbackPostTitle", label: "Fallback Post Title", type: "string" }
+          ]
+        }
+      ]
+    },
+    {
       name: "contactForm",
       label: "Contact Form",
       type: "object",
@@ -799,6 +848,7 @@ var aboutMockup17BlockSchema = {
       name: "hero",
       label: "Hero Section",
       fields: [
+        { name: "breadcrumbLabel", label: "Breadcrumb Home Label", type: "string" },
         { name: "eyebrow", label: "Eyebrow", type: "string" },
         { name: "headline", label: "Headline", type: "string" },
         { name: "lede", label: "Lede", type: "string", ui: { component: "textarea" } }
@@ -824,6 +874,7 @@ var aboutMockup17BlockSchema = {
         { name: "eyebrow", label: "Eyebrow", type: "string" },
         { name: "title", label: "Title", type: "string" },
         { name: "intro", label: "Intro", type: "string", ui: { component: "textarea" } },
+        { name: "paragraphTwo", label: "Paragraph 2", type: "string", ui: { component: "textarea" } },
         {
           name: "items",
           label: "Coverage Cards",
@@ -882,6 +933,7 @@ var aboutMockup17BlockSchema = {
         { name: "eyebrow", label: "Eyebrow", type: "string" },
         { name: "title", label: "Title", type: "string" },
         { name: "intro", label: "Intro", type: "string", ui: { component: "textarea" } },
+        { name: "paragraphTwo", label: "Paragraph 2", type: "string", ui: { component: "textarea" } },
         {
           name: "contacts",
           label: "Contact Cards",
@@ -909,8 +961,12 @@ var contactMockup17BlockSchema = {
       name: "hero",
       label: "Hero Section",
       fields: [
-        { name: "eyebrow", label: "Eyebrow", type: "string" },
-        { name: "headline", label: "Headline", type: "string" },
+        { name: "breadcrumbHome", label: "Breadcrumb Home Label", type: "string" },
+        { name: "breadcrumbHomeLink", label: "Breadcrumb Home Link", type: "string" },
+        { name: "breadcrumbSeparator", label: "Breadcrumb Separator", type: "string" },
+        { name: "breadcrumbCurrent", label: "Current Page Breadcrumb", type: "string" },
+        { name: "headlineLead", label: "Headline", type: "string" },
+        { name: "headlineAccent", label: "Headline Accent", type: "string" },
         { name: "lede", label: "Lede", type: "string", ui: { component: "textarea" } }
       ]
     },
@@ -921,20 +977,21 @@ var contactMockup17BlockSchema = {
       fields: [
         { name: "eyebrow", label: "Eyebrow", type: "string" },
         { name: "title", label: "Title", type: "string" },
-        { name: "description", label: "Description", type: "string", ui: { component: "textarea" } },
+        { name: "nameLabel", label: "Name Field Label", type: "string" },
+        { name: "phoneLabel", label: "Phone Field Label", type: "string" },
+        { name: "emailLabel", label: "Email Field Label", type: "string" },
+        { name: "messageLabel", label: "Message Field Label", type: "string" },
         { name: "buttonText", label: "Button Text", type: "string" },
         { name: "note", label: "Form Note", type: "string", ui: { component: "textarea" } },
-        { name: "formAction", label: "Form Action URL / Formspree Endpoint", type: "string", description: "Optional. Leave blank to keep the form non-submitting until an endpoint is added." },
+        { name: "formAction", label: "Form Action URL / Formspree Endpoint", type: "string", description: "Optional page override. When blank, the endpoint comes dynamically from Global Config." },
         { name: "subject", label: "Email Subject", type: "string" }
       ]
     },
     {
       type: "object",
       name: "inboxes",
-      label: "Where to Write / Inbox Cards",
+      label: "Inbox Cards",
       fields: [
-        { name: "eyebrow", label: "Eyebrow", type: "string" },
-        { name: "title", label: "Title", type: "string" },
         {
           name: "cards",
           label: "Inbox Cards",
@@ -954,16 +1011,13 @@ var contactMockup17BlockSchema = {
       name: "requests",
       label: "Specific Requests Section",
       fields: [
-        { name: "eyebrow", label: "Eyebrow", type: "string" },
-        { name: "title", label: "Title", type: "string" },
-        { name: "intro", label: "Intro", type: "string", ui: { component: "textarea" } },
         {
           name: "cards",
           label: "Request Cards",
           type: "object",
           list: true,
           fields: [
-            { name: "icon", label: "Icon", type: "string", options: ["alert", "document", "mail"] },
+            { name: "number", label: "Number", type: "string" },
             { name: "title", label: "Title", type: "string" },
             { name: "text", label: "Text", type: "string", ui: { component: "textarea" } }
           ]
@@ -979,6 +1033,7 @@ var ourTeamMockup17BlockSchema = {
   label: "Our Team Page Template Sections",
   fields: [
     { type: "object", name: "hero", label: "Hero Section", fields: [
+      { name: "breadcrumbLabel", label: "Breadcrumb Home Label", type: "string" },
       { name: "eyebrow", label: "Eyebrow", type: "string" },
       { name: "headline", label: "Headline", type: "string" },
       { name: "lede", label: "Lede", type: "string", ui: { component: "textarea" } }

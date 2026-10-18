@@ -1,13 +1,14 @@
 ---
 import Base from '../layouts/Base.astro';
 import Demo404 from '../components/demo/Demo404.astro';
-import { listBlogs } from '../lib/data';
+import { getConfig } from '../lib/data';
 
-const title = '404 | Page Not Found | Starter Site';
-const description = 'The page you are looking for may have moved, been removed, or never existed.';
-const posts = (await listBlogs()).slice(0, 3);
+const config = (await getConfig()).data?.config;
+const content = config?.systemPages?.notFound;
+const title = content?.metaTitle;
+const description = content?.metaDescription;
 ---
 
 <Base title={title} description={description} noindex={true}>
-  <Demo404 posts={posts} />
+  <Demo404 content={content} />
 </Base>

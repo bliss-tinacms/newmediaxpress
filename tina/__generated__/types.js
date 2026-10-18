@@ -194,6 +194,7 @@ export const PagePartsFragmentDoc = gql`
     ... on PageBlocksAboutMockup17 {
       hero {
         __typename
+        breadcrumbLabel
         eyebrow
         headline
         lede
@@ -211,6 +212,7 @@ export const PagePartsFragmentDoc = gql`
         eyebrow
         title
         intro
+        paragraphTwo
         items {
           __typename
           number
@@ -247,6 +249,7 @@ export const PagePartsFragmentDoc = gql`
         eyebrow
         title
         intro
+        paragraphTwo
         contacts {
           __typename
           icon
@@ -259,6 +262,7 @@ export const PagePartsFragmentDoc = gql`
     ... on PageBlocksOurTeamMockup17 {
       hero {
         __typename
+        breadcrumbLabel
         eyebrow
         headline
         lede
@@ -295,15 +299,22 @@ export const PagePartsFragmentDoc = gql`
     ... on PageBlocksContactMockup17 {
       hero {
         __typename
-        eyebrow
-        headline
+        breadcrumbHome
+        breadcrumbHomeLink
+        breadcrumbSeparator
+        breadcrumbCurrent
+        headlineLead
+        headlineAccent
         lede
       }
       formSection {
         __typename
         eyebrow
         title
-        description
+        nameLabel
+        phoneLabel
+        emailLabel
+        messageLabel
         buttonText
         note
         formAction
@@ -311,8 +322,6 @@ export const PagePartsFragmentDoc = gql`
       }
       inboxes {
         __typename
-        eyebrow
-        title
         cards {
           __typename
           title
@@ -323,12 +332,9 @@ export const PagePartsFragmentDoc = gql`
       }
       requests {
         __typename
-        eyebrow
-        title
-        intro
         cards {
           __typename
-          icon
+          number
           title
           text
         }
@@ -538,6 +544,39 @@ export const ConfigPartsFragmentDoc = gql`
     ctaButtonLink
     footerTagline
     copyrightSuffix
+  }
+  articleSettings {
+    __typename
+    standardsEyebrow
+    standardsTitle
+    standardsText
+    standardsButtonText
+    standardsButtonLink
+  }
+  systemPages {
+    __typename
+    notFound {
+      __typename
+      metaTitle
+      metaDescription
+      code
+      heading
+      message
+      buttonText
+      buttonLink
+    }
+    sitemap {
+      __typename
+      metaTitle
+      metaDescription
+      heading
+      pagesHeading
+      postsHeading
+      emptyPagesText
+      emptyPostsText
+      fallbackPageTitle
+      fallbackPostTitle
+    }
   }
   contactForm {
     __typename

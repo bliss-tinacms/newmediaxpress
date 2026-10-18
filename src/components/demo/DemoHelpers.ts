@@ -16,7 +16,7 @@ export function labelFromReference(reference: unknown, fallback = 'News'): strin
   return fallback;
 }
 
-export function getAuthorName(reference: unknown, fallback = 'Starter Site Staff') {
+export function getAuthorName(reference: unknown, fallback = 'New Media Xpress Staff') {
   return labelFromReference(reference, fallback);
 }
 

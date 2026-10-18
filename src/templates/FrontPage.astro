@@ -1,8 +1,9 @@
 ---
 import { tinaField } from "tinacms/dist/react";
 import CTA from "./CTA.astro";
+import { getBlogPermalink } from "../lib/permalinks";
 interface Props { page?: any; data?: any; editData?: any; posts?: any[]; users?: any[]; config?: any; }
-const { page: pageProp, data, editData, posts = [] } = Astro.props;
+const { page: pageProp, data, editData, posts = [], users = [] } = Astro.props;
 const page = pageProp || data || {};
 const block = page?.blocks?.[0] || {};
 const editBlock = editData?.blocks?.[0];
@@ -12,7 +13,8 @@ const why = block.why || {};
 const values = block.values || {};
 const featured = posts.slice(0, 4);
 const team = block.contact?.cards || [];
-const storyHref = (p:any) => `/blog/${p.permalink || p._sys?.filename || ""}/`;
+const teamUser = (name: string) => users.find((user: any) => String(user?.name || '').trim().toLowerCase() === String(name || '').trim().toLowerCase());
+const storyHref = (p:any) => { const href = getBlogPermalink(p); return href.endsWith('/') ? href : href + '/'; };
 const catLabel = (p:any) => { const c = p.categories?.[0]; return typeof c === "object" ? c?.title : String(c || "Business").split("/").pop()?.replace(/\.json$/i,""); };
 ---
 <main class="nx-home">
@@ -56,7 +58,7 @@ const catLabel = (p:any) => { const c = p.categories?.[0]; return typeof c === "
     <img src={block.wireFeature?.image} alt={block.wireFeature?.imageAlt || ""}/><div class="nx-commitment__shade"></div><div class="nx-shell nx-commitment__inner"><p class="nx-kicker nx-kicker--white">{block.wireFeature?.eyebrow}</p><blockquote>“{block.wireFeature?.quote}”</blockquote><div class="nx-person"><img src={block.wireFeature?.avatar} alt=""/><p><strong>{block.wireFeature?.author}</strong><span>{block.wireFeature?.byline}</span></p></div></div>
   </section>
 
-  <section class="nx-section nx-team" data-tina-field={editBlock ? tinaField(editBlock, "contact") : undefined}><div class="nx-shell"><p class="nx-kicker">{block.contact?.eyebrow}</p><h2>{block.contact?.title}</h2><div class="nx-team-grid">{team.map((person:any, i:number)=><a href={i===3 ? "/blog/author/carol-burke/" : "/team/"}><span class="nx-team__avatar">{person.title?.split(" ").map((x:string)=>x[0]).join("")}</span><strong>{person.title}</strong><b>{person.email}</b><small>{person.text}</small></a>)}</div></div></section>
+  <section class="nx-section nx-team" data-tina-field={editBlock ? tinaField(editBlock, "contact") : undefined}><div class="nx-shell"><p class="nx-kicker">{block.contact?.eyebrow}</p><h2>{block.contact?.title}</h2><div class="nx-team-grid">{team.map((person:any)=>{ const user = teamUser(person.title); return <a href={user?._sys?.filename ? `/author/${user._sys.filename}/` : "/our-team/"}>{user?.avatar ? <img class="nx-team__avatar nx-team__avatar--image" src={user.avatar} alt={person.title || ''}/> : <span class="nx-team__avatar">{person.title?.split(" ").map((x:string)=>x[0]).join("")}</span>}<strong>{person.title}</strong><b>{person.email}</b><small>{person.text}</small></a>})}</div></div></section>
 
   <CTA heading={block.newsroom?.submitHeading} buttonText={block.newsroom?.submitButtonText} buttonLink={block.newsroom?.submitButtonLink}/>
 </main>

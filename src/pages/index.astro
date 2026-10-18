@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import TinaIsland from '@tinacms/astro/TinaIsland.astro';
 import FrontPage from '../templates/FrontPage.astro';
-import { getConfig, getEditablePage, getPublicPage, listBlogs } from '../lib/data';
+import { getConfig, getEditablePage, getPublicPage, listBlogs, listUsers } from '../lib/data';
 import { islands } from '../lib/islands';
 
 const slug = 'home';
@@ -13,9 +13,10 @@ const editData = editPage.data?.page ?? data;
 if (!data) return new Response('Not Found', { status: 404 });
 const config = (await getConfig()).data?.config ?? null;
 const posts = await listBlogs();
+const users = await listUsers();
 const seo = data.seo ?? null;
-const title = seo?.metaTitle || data.seoTitle || config?.seo?.title || 'Harbor Post';
-const description = seo?.metaDescription || config?.seo?.description || 'Independent local reporting for the harbor counties.';
+const title = seo?.metaTitle || data.seoTitle || config?.seo?.title || 'New Media Xpress';
+const description = seo?.metaDescription || config?.seo?.description || 'Important stories, made clear.';
 ---
 
 <Base
@@ -29,6 +30,6 @@ const description = seo?.metaDescription || config?.seo?.description || 'Indepen
 	nofollow={seo?.nofollow || false}
 >
 	<TinaIsland name="page" wrapper={islands.page.wrapper} params={{ slug }} primary>
-		<FrontPage posts={posts} config={config} data={data} editData={editData} />
+		<FrontPage posts={posts} users={users} config={config} data={data} editData={editData} />
 	</TinaIsland>
 </Base>

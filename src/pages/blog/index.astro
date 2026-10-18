@@ -7,7 +7,7 @@ export const prerender = false;
 
 const posts = await listBlogs();
 const config = (await getConfig()).data?.config ?? null;
-const siteName = config?.seo?.title ?? 'Starter Site';
+const siteName = config?.seo?.title ?? 'New Media Xpress';
 const title = `Blog | ${siteName}`;
 const description = config?.seo?.description ?? 'Latest blog posts.';
 ---

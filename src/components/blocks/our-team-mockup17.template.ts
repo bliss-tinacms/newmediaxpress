@@ -3,6 +3,7 @@ export const ourTeamMockup17BlockSchema = {
   label: 'Our Team Page Template Sections',
   fields: [
     { type: 'object', name: 'hero', label: 'Hero Section', fields: [
+      { name: 'breadcrumbLabel', label: 'Breadcrumb Home Label', type: 'string' },
       { name: 'eyebrow', label: 'Eyebrow', type: 'string' },
       { name: 'headline', label: 'Headline', type: 'string' },
       { name: 'lede', label: 'Lede', type: 'string', ui: { component: 'textarea' } },
