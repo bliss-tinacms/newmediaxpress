@@ -97,6 +97,12 @@ function getPostDescription(post: CmsBlog) {
 	return post.description || 'Read the full report.';
 }
 
+function getArticleAuthorBio(bio?: string | null) {
+	if (!bio) return 'New Media Xpress newsroom contributor.';
+	const sentences = bio.match(/[^.!?]+[.!?]+(?:["”'](?=\s|$))?|[^.!?]+$/g)?.map((sentence) => sentence.trim()).filter(Boolean) || [];
+	return sentences.slice(0, 2).join(' ') || bio;
+}
+
 function getText(node: unknown): string {
 	if (!node || typeof node !== 'object') return '';
 	const item = node as RichNode;
@@ -247,7 +253,7 @@ const heroImageAlt = (() => {
 						<div>
 							<div class="corr-t">About the author</div>
 							<strong id="post-author-heading"><a href={authorArchiveUrl}>{authorName}</a></strong>
-							<div class="corr-b">{author?.bio || 'New Media Xpress newsroom contributor.'}</div>
+							<div class="corr-b">{getArticleAuthorBio(author?.bio)}</div>
 						</div>
 					</section>
 				</article>

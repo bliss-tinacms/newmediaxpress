@@ -1,4 +1,6 @@
-@font-face{font-family:ArchivoNX;src:url('/mockup-assets/bff5bd7d-6855-4359-959e-345a31f81fc3.woff2') format('woff2');font-style:normal;font-weight:100 900;font-display:swap}
+@font-face{font-family:ArchivoNX;src:url('/mockup-assets/5e902ab0-e621-493e-b280-9462592ff2b0.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:ArchivoNX;src:url('/mockup-assets/2b06c65e-5ed2-44a2-ac3c-3a2a4149909e.woff2') format('woff2');font-style:normal;font-weight:500 600;font-display:swap}
+@font-face{font-family:ArchivoNX;src:url('/mockup-assets/bff5bd7d-6855-4359-959e-345a31f81fc3.woff2') format('woff2');font-style:normal;font-weight:700 900;font-display:swap}
 :root{--nx-ink:#0f1e33;--nx-blue:#0b7bdb;--nx-sky:#eaf4fd;--nx-muted:#5b6b82;--nx-shell:1360px}
 html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--nx-ink);font-family:ArchivoNX,Archivo,Arial,sans-serif;font-size:18px;line-height:1.6}*{box-sizing:border-box}a{text-decoration:none}.nx-shell,.w{width:min(var(--nx-shell),100%);margin-inline:auto;padding-inline:clamp(16px,3vw,32px)}
 .nx-header{position:sticky;top:0;z-index:50;background:#fff;border-bottom:2px solid var(--nx-ink)}.nx-header__inner{min-height:70px;padding-block:14px;display:flex;align-items:center;justify-content:space-between;gap:12px 32px}.nx-logo{display:flex;flex:none}.nx-logo img{height:clamp(30px,3vw,40px);width:auto}.nx-nav{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:6px 24px;font-weight:700;font-size:15px;text-transform:uppercase;letter-spacing:.04em}.nx-nav a{color:var(--nx-ink)}.nx-nav a:last-child{color:var(--nx-blue)}
@@ -133,3 +135,33 @@ html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--nx-ink);fo
  .nx-home .nx-cta__inner{padding-top:40px;padding-bottom:40px;gap:24px}.nx-home .nx-cta h2{font-size:32px}
 }
 @media(prefers-color-scheme:dark){html,body,.nx-header,.nx-home,.nx-home section:not(.nx-about):not(.nx-commitment):not(.nx-cta),.nx-value-grid article{background-color:#fff;color:#0f1e33}.nx-footer,.nx-commitment{background-color:#0f1e33;color:#fff}}
+
+/* The supplied New Media Xpress references use the bundled Barlow display
+   face. global.css also carries legacy demo heading rules for Bitter and Big
+   Shoulders Display; keep those rules from leaking into this site shell. */
+:is(.nx-home,.nx-about-page,.nx-contact,.nx-policy,.nx-system-sitemap,.nx-system-404,.nx-archive-hero,.nx-author-hero,.ah,.bd,.mo) :is(h1,h2,h3,.h2,.rr-h,.mi-t),
+.nx-cta h2{
+  font-family:ArchivoNX,Archivo,Arial,sans-serif!important;
+}
+
+/* Remove the orange top rule and article-card treatments inherited from the
+   unrelated legacy demo stylesheet. */
+.tr{display:none!important}
+.bd .pr p{color:var(--nx-ink)!important;font-size:20px!important;font-weight:400!important;line-height:1.8!important}
+.bd .pr>div>p:first-child{font-weight:600!important}
+.bd .pr h2{border:0!important;padding-bottom:0!important}
+.bd .pr h2::after{display:none!important}
+.bd .pr ul{list-style:disc!important;margin:1em 0!important;padding-left:1.25em!important}
+.bd .pr li{border:0!important;padding:0!important;color:var(--nx-ink)!important;font-size:20px!important;font-weight:400!important;line-height:1.8!important}
+.bd .pr li::marker{color:var(--nx-ink)!important}
+.bd .toc{border:0!important;background:var(--nx-sky)!important;padding:20px!important}
+.bd .toc .rc-t{padding:0!important;background:transparent!important;color:var(--nx-blue)!important}
+.bd .toc .rc-b{padding:12px 0 0!important}
+.bd .toc .tc{border:0!important;padding:6px 0!important}
+.bd .standards-card .rr-h{color:#fff!important}
+.bd .standards-card .rc-b p{color:#ffffffbf!important;font-size:16px!important;font-weight:400!important;line-height:1.55!important}
+.mo .mi{display:flex!important;flex-direction:column!important;border:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+.mo .mi-c{padding:0!important;background:transparent!important}
+.mo .mi-img{border-radius:20px!important}
+.mo .mi-h{font-family:ArchivoNX,Archivo,Arial,sans-serif!important;color:var(--nx-ink)!important;font-size:23px!important;line-height:1.2!important;font-weight:800!important}
+.mo .mi-x{color:var(--nx-muted)!important;font-family:ArchivoNX,Archivo,Arial,sans-serif!important;font-size:14px!important;font-weight:400!important}
