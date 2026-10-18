@@ -21,7 +21,22 @@ try {
     if ((cloudCheck.status ?? 1) !== 0) {
       status = cloudCheck.status ?? 1;
     } else {
-      status = run(['build', '--skip-cloud-checks', '--noTelemetry', '-c', 'astro build']).status ?? 1;
+      // Generate the proxy-configured admin, then sanitize the generated client
+      // before Astro bundles server code. Tina's generated client otherwise
+      // contains the build-time token as a literal in dist/server.
+      const proxyBuild = run(['build', '--skip-cloud-checks', '--noTelemetry', '-c', 'node --version']);
+      if ((proxyBuild.status ?? 1) !== 0) {
+        status = proxyBuild.status ?? 1;
+      } else {
+        sanitizeGeneratedClient();
+        const serverEnv = { ...process.env };
+        delete serverEnv.TINA_TOKEN;
+        status = spawnSync('pnpm', ['exec', 'astro', 'build'], {
+          stdio: 'inherit',
+          env: serverEnv,
+          shell: process.platform === 'win32',
+        }).status ?? 1;
+      }
     }
   }
 } finally {
