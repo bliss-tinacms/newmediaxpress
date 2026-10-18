@@ -21,10 +21,11 @@ try {
     if ((cloudCheck.status ?? 1) !== 0) {
       status = cloudCheck.status ?? 1;
     } else {
-      // Generate the proxy-configured admin, then sanitize the generated client
-      // before Astro bundles server code. Tina's generated client otherwise
-      // contains the build-time token as a literal in dist/server.
-      const proxyBuild = run(['build', '--skip-cloud-checks', '--noTelemetry', '-c', 'node --version']);
+      // Build the production admin directly against Tina Cloud. Setting a
+      // contentApiUrlOverride while generating the admin makes Tina classify
+      // the browser client as local mode, even when the override is an HTTPS
+      // same-origin proxy. Public SSR can still use the proxy independently.
+      const proxyBuild = run(['build', '--skip-cloud-checks', '--noTelemetry', '-c', 'node --version'], cloudEnv);
       if ((proxyBuild.status ?? 1) !== 0) {
         status = proxyBuild.status ?? 1;
       } else {
