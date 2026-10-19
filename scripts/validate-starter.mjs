@@ -57,11 +57,16 @@ if (!/CategoryBadgeParser/.test(fullcheck) || !/actual_categories\s*!=\s*expecte
 if (!/AUTHOR-ISLAND-EDITABILITY-001/.test(fullcheck) || !/fetch_author_island/.test(fullcheck) || !/queryLength/.test(fullcheck) || !/primaryCount/.test(fullcheck)) {
   fail('TINA-FULLCHECK must enforce AUTHOR-ISLAND-EDITABILITY-001 with real query, variables, user data, and one primary form.');
 }
+if (!/EMPTY-POST-LIST-001/.test(fullcheck) || !/categoryConnection/.test(fullcheck) || !/data-empty-post-list/.test(fullcheck) || !/No published posts yet\./.test(fullcheck)) {
+  fail('TINA-FULLCHECK must enforce EMPTY-POST-LIST-001 against a real zero-post category and a non-empty control archive.');
+}
 const multiCatFixture = read('src/content/blog/why-grocery-prices-stopped-falling-in-september.mdx').split('---')[1] || '';
 const fixtureCategoryBlock = multiCatFixture.match(/categories:\s*\n((?:\s+-\s+[^\n]+\n?)+)/)?.[1] || '';
 if ((fixtureCategoryBlock.match(/^\s+-\s+/gm) || []).length < 2) fail('MULTICAT-LOCK fixture must retain at least two categories.');
 
 const authorArchive = read('src/components/demo/DemoAuthorArchive.astro');
+const categoryArchive = read('src/components/demo/DemoCategoryArchive.astro');
+const emptyPostList = read('src/components/demo/EmptyPostList.astro');
 const authorRoute = read('src/pages/author/[...slug].astro');
 const dataSource = read('src/lib/data.ts');
 if (!/<TinaIsland\s+name=["']author["'][\s\S]{0,200}params=\{\{\s*slug:\s*parsed\.slug\s*\}\}[\s\S]{0,100}primary/.test(authorRoute)) {
@@ -72,6 +77,14 @@ if (/return\s+await\s+requestWithMetadata\(client\.queries\.user\(/.test(dataSou
 }
 if (!/fetchLiveTinaResult<\{ user: any \}>\(UserDocument/.test(dataSource) || !/Author editor query returned no authoritative Tina document/.test(dataSource)) {
   fail('AUTHOR-ISLAND-EDITABILITY-001 requires direct authoritative User metadata and fail-closed generated fallback validation.');
+}
+if (!/data-empty-post-list/.test(emptyPostList) || !/No published posts yet\./.test(emptyPostList) || !/role=["']status["']/.test(emptyPostList)) {
+  fail('ASTRO-DEMO-LOCK / EMPTY-POST-LIST-001 requires the accessible shared “No published posts yet.” state.');
+}
+for (const [source, label] of [[categoryArchive, 'category/blog archives'], [authorArchive, 'author archives']]) {
+  if (!/import\s+EmptyPostList/.test(source) || !/\{!lead\s*&&\s*<EmptyPostList\s*\/>\}/.test(source)) {
+    fail(`ASTRO-DEMO-LOCK / EMPTY-POST-LIST-001 requires the shared empty state in ${label}.`);
+  }
 }
 const nmxCss = read('src/styles/newmediaxpress.css');
 if (/<small>\s*(?:Latest|\{author\.latestLabel\})\s*<\/small>/.test(authorArchive)) {
@@ -85,6 +98,7 @@ for (const requiredRule of [
   '.nx-author .nx-lead-story{padding:clamp(48px,6vw,80px) 0 clamp(48px,6vw,80px) clamp(32px,4.7vw,68px)}',
   '.nx-author .nx-lead-story>a{grid-template-columns:repeat(2,minmax(0,620px));align-items:start}',
   '.nx-author .nx-lead-story>a>img{aspect-ratio:20/9}',
+  '.nx-empty-post-list{padding-top:clamp(48px,6vw,80px);padding-bottom:clamp(48px,6vw,80px)}',
 ]) {
   if (!nmxCss.includes(requiredRule)) fail(`ASTRO-DEMO-LOCK missing Jessica author fixture rule: ${requiredRule}`);
 }
@@ -154,6 +168,8 @@ else {
     ['TINA-FULLCHECK', 'collection-complete fullcheck gate'],
     ['PUBLISHER-ADMIN-GATE', 'authenticated live-admin acceptance gate'],
     ['AUTHOR-ISLAND-EDITABILITY-001', 'author island editability regression gate'],
+    ['EMPTY-POST-LIST-001', 'empty post-list regression gate'],
+    ['ASTRO-DEMO-LOCK', 'empty archive exact-demo lock'],
     ['exact restoration', 'reversible cleanup gate'],
   ];
   for (const [needle, label] of requiredGates) {

@@ -140,6 +140,20 @@ exact original through the UI, and prove backend/public restoration and marker
 absence. Record the ID with PASS, FAIL, or BLOCKED evidence; never omit it from
 a migration report.
 
+**Mandatory regression ID: `EMPTY-POST-LIST-001` under `ASTRO-DEMO-LOCK`.**
+Every category, blog index, author archive, or equivalent post-list surface must
+render the shared, accessible copy **“No published posts yet.”** exactly once
+when its published-post array is empty. It must never leave a blank content
+region, render an empty lead/grid wrapper, or show the empty message when at
+least one published post exists. This behavior belongs in the reusable
+boilerplate archive components rather than a one-off route condition, and its
+spacing/typography remain part of ASTRO-DEMO-LOCK. `TINA-FULLCHECK` must derive
+a real zero-post category from the Tina Category and Blog collections, verify
+the marked empty state and exact copy on that live archive (preferring
+`/world-news/` when it is empty), and verify a non-empty control archive does
+not contain the marker. If no zero-post fixture exists, the gate is `BLOCKED`;
+it must not silently skip the assertion.
+
 Coverage must be derived from the configured Tina collection set and equal the explicit test map. For every configured collection—normally Blog, Page, Category, User, Navigation, and Global Config—use the real live Publisher admin account and run:
 
 1. open the exact document and wait for its real fields;

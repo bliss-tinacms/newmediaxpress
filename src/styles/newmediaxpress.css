@@ -209,6 +209,9 @@ html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--nx-ink);fo
 .nx-author .nx-author-hero__inner>div>span{align-self:flex-start}
 .nx-author .nx-lead-story{padding-bottom:clamp(48px,6vw,80px)}
 .nx-archive>.nx-lead-story+.nx-cta{margin-top:clamp(48px,6vw,80px)}
+/* ASTRO-DEMO-LOCK / EMPTY-POST-LIST-001: every empty archive stays explicit. */
+.nx-empty-post-list{padding-top:clamp(48px,6vw,80px);padding-bottom:clamp(48px,6vw,80px)}
+.nx-empty-post-list p{margin:0;color:var(--nx-muted);font-size:clamp(20px,2vw,26px);font-weight:700;line-height:1.4}
 @media (min-width:901px){
   .nx-author .nx-author-hero__inner{padding-top:clamp(56px,5.625vw,87px);padding-bottom:24px}
   .nx-author .nx-lead-story{padding:clamp(48px,6vw,80px) 0 clamp(48px,6vw,80px) clamp(32px,4.7vw,68px)}

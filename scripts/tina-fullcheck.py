@@ -31,6 +31,8 @@ REQUIRED = {"blog", "page", "category", "user", "navigation", "config"}
 SEO_FIELDS = "metaTitle metaDescription ogTitle ogDescription ogImage canonicalUrl noindex nofollow"
 AUTHOR_ISLAND_GATE_ID = "AUTHOR-ISLAND-EDITABILITY-001"
 AUTHOR_FIXTURE_SLUG = "donna-shelton"
+EMPTY_POST_LIST_GATE_ID = "EMPTY-POST-LIST-001"
+EMPTY_POST_LIST_COPY = "No published posts yet."
 
 
 class DocumentParser(HTMLParser):
@@ -124,6 +126,7 @@ def query_backend() -> dict:
     query AllCollectionFullcheck {{
       blog(relativePath: "why-grocery-prices-stopped-falling-in-september.mdx") {{ title description categories seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       blogs: blogConnection(first: 100) {{ edges {{ node {{ categories }} }} }}
+      categories: categoryConnection(first: 100) {{ edges {{ node {{ title _sys {{ filename }} }} }} }}
       page(relativePath: "home.mdx") {{ title seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       category(relativePath: "Business.json") {{ title description seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       user(relativePath: "{AUTHOR_FIXTURE_SLUG}.json") {{ name role bio seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
@@ -256,12 +259,47 @@ def main() -> int:
     for name in sorted(REQUIRED):
         if not data.get(name): failures.append(f"{name}: Tina query returned no document")
 
+    assigned_category_slugs = {
+        category_badge(value)["slug"]
+        for edge in (data.get("blogs", {}).get("edges") or [])
+        for value in ((edge.get("node") or {}).get("categories") or [])
+    }
+    category_nodes = [
+        edge.get("node") or {}
+        for edge in (data.get("categories", {}).get("edges") or [])
+        if isinstance(edge, dict)
+    ]
+    empty_category_candidates = [
+        node for node in category_nodes
+        if category_badge(str((node.get("_sys") or {}).get("filename") or node.get("title") or ""))["slug"] not in assigned_category_slugs
+    ]
+    empty_category_candidates.sort(key=lambda node: (
+        category_badge(str((node.get("_sys") or {}).get("filename") or node.get("title") or ""))["slug"] != "world-news",
+        category_badge(str((node.get("_sys") or {}).get("filename") or node.get("title") or ""))["slug"],
+    ))
+    empty_category = empty_category_candidates[0] if empty_category_candidates else None
+    empty_category_slug = category_badge(str((empty_category or {}).get("_sys", {}).get("filename") or (empty_category or {}).get("title") or ""))["slug"]
+
     routes = {
         "page": fetch_route("/"),
         "blog": fetch_route("/why-grocery-prices-stopped-falling-in-september/"),
         "category": fetch_route("/business/"),
         "user": fetch_route(f"/author/{AUTHOR_FIXTURE_SLUG}/"),
     }
+    empty_post_list_result = {"id": EMPTY_POST_LIST_GATE_ID, "status": "FAIL", "route": None, "copy": EMPTY_POST_LIST_COPY}
+    if not empty_category_slug:
+        failures.append(f"{EMPTY_POST_LIST_GATE_ID}: no zero-post category fixture exists for live empty-state verification")
+    else:
+        empty_route_path = f"/{empty_category_slug}/"
+        routes["emptyCategory"] = fetch_route(empty_route_path)
+        empty_html = routes["emptyCategory"]["html"]
+        marker_count = empty_html.count("data-empty-post-list")
+        copy_count = empty_html.count(EMPTY_POST_LIST_COPY)
+        if marker_count != 1 or copy_count != 1:
+            failures.append(f"{EMPTY_POST_LIST_GATE_ID}: {empty_route_path} must render exactly one marked {EMPTY_POST_LIST_COPY!r} state; marker={marker_count}, copy={copy_count}")
+        if "data-empty-post-list" in routes["category"]["html"]:
+            failures.append(f"{EMPTY_POST_LIST_GATE_ID}: non-empty /business/ archive rendered the empty state")
+        empty_post_list_result.update({"route": empty_route_path, "markerCount": marker_count, "copyCount": copy_count})
     author_island = fetch_author_island(failures)
     config, page, blog, category, user = data["config"], data["page"], data["blog"], data["category"], data["user"]
     site_title = config.get("seo", {}).get("title") or "New Media Xpress"
@@ -302,7 +340,8 @@ def main() -> int:
 
     author_island["id"] = AUTHOR_ISLAND_GATE_ID
     author_island["status"] = "PASS" if not any(AUTHOR_ISLAND_GATE_ID in failure for failure in failures) else "FAIL"
-    report = {"site": SITE, "gateIds": [AUTHOR_ISLAND_GATE_ID], "configuredCollections": sorted(configured), "requiredCollections": sorted(REQUIRED), "coverageComplete": configured == REQUIRED, "collections": {name: {"backendDocument": data.get(name, {}).get("_sys", {}).get("filename"), "status": "PASS" if data.get(name) else "FAIL"} for name in sorted(REQUIRED)}, "routes": {name: {"status": route["status"], "cache": route["cache"]} for name, route in routes.items()}, "islands": {"author": author_island}, "seo": seo_results, "multicat": {"backend": expected_categories, "public": actual_categories, "exactMatch": actual_categories == expected_categories and len(expected_categories) >= 2}, "failures": failures}
+    empty_post_list_result["status"] = "PASS" if not any(EMPTY_POST_LIST_GATE_ID in failure for failure in failures) else "FAIL"
+    report = {"site": SITE, "gateIds": [AUTHOR_ISLAND_GATE_ID, EMPTY_POST_LIST_GATE_ID], "configuredCollections": sorted(configured), "requiredCollections": sorted(REQUIRED), "coverageComplete": configured == REQUIRED, "collections": {name: {"backendDocument": data.get(name, {}).get("_sys", {}).get("filename"), "status": "PASS" if data.get(name) else "FAIL"} for name in sorted(REQUIRED)}, "routes": {name: {"status": route["status"], "cache": route["cache"]} for name, route in routes.items()}, "islands": {"author": author_island}, "emptyPostList": empty_post_list_result, "seo": seo_results, "multicat": {"backend": expected_categories, "public": actual_categories, "exactMatch": actual_categories == expected_categories and len(expected_categories) >= 2}, "failures": failures}
     print(json.dumps(report, ensure_ascii=False, indent=2))
     print(f"TINA_FULLCHECK_OK {not failures}")
     return 0 if not failures else 1
