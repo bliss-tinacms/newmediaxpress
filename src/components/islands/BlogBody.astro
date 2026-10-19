@@ -194,13 +194,13 @@ const heroImageAlt = (() => {
 							)}
 						</a>
 						<div class="ah-au" data-tina-field={tinaField(data, 'author')}>
-							<div class="ah-an">By <a href={authorArchiveUrl}>{authorName}</a></div>
+							<div class="ah-an"><a href={authorArchiveUrl}>{authorName}</a></div>
 							{author?.role && <div class="ah-role">{author.role}</div>}
 						</div>
 						<div class="ah-dt">
 							{publishedDate && <span data-tina-field={tinaField(data, 'pubDate')}><FormattedDate date={publishedDate} /></span>}
-							{data.readingTime && <><br /><span>{data.readingTime}</span></>}
-							{data.updatedDate && <><br /><span data-tina-field={tinaField(data, 'updatedDate')}>Updated <FormattedDate date={new Date(data.updatedDate)} /></span></>}
+							{data.readingTime && <span>{data.readingTime}</span>}
+							{data.updatedDate && <span data-tina-field={tinaField(data, 'updatedDate')}>Updated <FormattedDate date={new Date(data.updatedDate)} /></span>}
 						</div>
 					</div>
 				</div>
@@ -218,7 +218,7 @@ const heroImageAlt = (() => {
 				<aside class="rl" aria-label="Article tools">
 					{hasToc && (
 						<div class="rc toc">
-							<div class="rc-t">Table of Content</div>
+							<div class="rc-t">Table of Contents</div>
 							<div class="rc-b">
 								{tocItems.map((item, index) => (
 									<a class="tc" href={`#${item.id}`}>

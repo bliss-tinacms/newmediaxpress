@@ -3,7 +3,7 @@ import Base from '../../layouts/Base.astro';
 import DemoAuthorArchive from '../../components/demo/DemoAuthorArchive.astro';
 import { getConfig, getUser, listBlogs } from '../../lib/data';
 
-const POSTS_PER_PAGE = 30;
+const POSTS_PER_PAGE = 7;
 
 type ReferenceObject = {
 	title?: string | null;
@@ -35,13 +35,6 @@ function slugFromReference(reference: unknown) {
 	return null;
 }
 
-function categorySlugs(post: any) {
-	const values = Array.isArray(post?.categories) ? post.categories : post?.category ? [post.category] : [];
-	return values
-		.map((item: any) => slugFromReference(typeof item === 'object' && item?.category ? item.category : item))
-		.filter(Boolean) as string[];
-}
-
 function parseArchiveParam(value?: string) {
 	const parts = (value || '').toLowerCase().split('/').filter(Boolean);
 	const pageIndex = parts.indexOf('page');
@@ -55,7 +48,7 @@ function parseArchiveParam(value?: string) {
 }
 
 export async function getStaticPaths() {
-	const perPage = 30;
+	const perPage = 7;
 	// IMPORTANT: helpers are duplicated inside getStaticPaths because Astro runs this
 	// function in a separate hoisted build scope.
 	const slugifyLocal = (value?: string | null) => (value || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
@@ -94,15 +87,7 @@ const parsed = parseArchiveParam(Astro.params.slug);
 const config = (await getConfig()).data?.config ?? null;
 const sitePosts = await listBlogs();
 const authorPosts = sitePosts.filter((post) => slugFromReference(post.author) === parsed.slug);
-const categoryCounts = new Map<string, number>();
-for (const post of authorPosts) {
-	for (const category of categorySlugs(post)) {
-		if (category === 'featured') continue;
-		categoryCounts.set(category, (categoryCounts.get(category) || 0) + 1);
-	}
-}
-const deskSlug = [...categoryCounts.entries()].sort((a, b) => b[1] - a[1])[0]?.[0] || null;
-const allPosts = deskSlug ? sitePosts.filter((post) => categorySlugs(post).includes(deskSlug)) : authorPosts;
+const allPosts = authorPosts;
 const totalPages = Math.max(1, Math.ceil(allPosts.length / POSTS_PER_PAGE));
 const currentPage = Math.min(Math.max(1, parsed.page), totalPages);
 const posts = allPosts.slice((currentPage - 1) * POSTS_PER_PAGE, currentPage * POSTS_PER_PAGE);
