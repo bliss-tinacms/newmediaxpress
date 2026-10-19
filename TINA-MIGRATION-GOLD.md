@@ -146,6 +146,176 @@ After deployment verify:
 
 Report every gate as `PASS`, `FAIL`, or `BLOCKED`, with evidence. Do not call the source or migration stable while a required gate is blocked. A source-ready commit can be reported while push, Cloud indexing, deployment, or live admin verification remain pending, but it must not be described as cloud/live accepted.
 
+## Migration-speed and finalization requirements
+
+The following requirements were added from the New Media Xpress migration. They make repeated migrations faster by eliminating avoidable rebuilds, stale assumptions, manual evidence reconstruction, and repeated mutation cycles. They do not weaken any acceptance gate.
+
+### 16. Split mutable acceptance from the immutable release
+
+- Run every authenticated save → backend → public → exact restore transaction during a clearly named **mutable acceptance stage**.
+- Record a content baseline before the first live mutation. At minimum, record document paths, complete hashes, tested field paths and values, relationship selections, referenced media, and temporary markers.
+- Maintain a transaction journal for every temporary test: document, field, original value, marker, save evidence, public selector/meta location, restoration evidence, and cleanup state.
+- Restoration must be proved by authenticated Tina data, cache-busted public output, marker absence, and baseline equality.
+- After all mutation tests pass, declare a **mutation cutoff**. Fetch and inspect Tina-generated commits, reconcile the branch without force-pushing, verify baseline restoration, and only then create the immutable production build.
+- After immutable deployment, run an authenticated **read-only** admin acceptance: correct project/branch, collections, restored fields, Save controls, no schema warning, non-empty sidebar, and exactly one intended primary form. Do not save again unless a failure explicitly reopens the mutable cycle.
+
+### 17. Standardize environment and destination resolution
+
+- Every Node, Python, Tina, Astro, build, verification, and deploy script must use one shared resolver for site identity and Tina variables.
+- Resolve the client ID in this order: `NEXT_PUBLIC_TINA_CLIENT_ID`, then `TINA_CLIENT_ID`, otherwise fail.
+- Resolve the branch in this order: `NEXT_PUBLIC_TINA_BRANCH`, `TINA_BRANCH`, `GITHUB_CONTENT_BRANCH`, then an explicitly documented default such as `main`.
+- Resolve and validate the destination site URL, repository, Tina project, branch, Cloudinary root, Formspree identity, app root, and public root once; pass the normalized result to all later tools.
+- Logs may report only configured/missing state and non-secret identifiers that are safe for the release report. Never print tokens, passwords, API secrets, authenticated request bodies, or tracker secret cells.
+
+### 18. Preflight external access before expensive work
+
+Before implementation or a production build:
+
+- verify the Git remote and the intended non-interactive write path;
+- verify Tina authentication, project authorization, connected repository, branch, read-token access, index state, and returned publication identity separately;
+- verify Cloudinary and Formspree destination identity without sending an unauthorized live submission;
+- discover cPanel capabilities for upload, list, read, mkdir, extract, unlink, chmod, cron add/list/remove, Passenger inspection, and restart;
+- verify Publisher credentials can reach the actual Tina login without printing or persisting them outside protected temporary state.
+
+Prepare a temporary secret-backed `GIT_ASKPASS` or equivalent only when needed, protect it with mode `0600`, never embed credentials in a remote URL, and remove it in a guaranteed cleanup path.
+
+### 19. Classify Tina Cloud/index failures and retry only transient states
+
+- Distinguish branch-not-found-before-first-push, indexing pending, stale schema, wrong project/repository, unauthorized token, proxy HTML returned to a Cloud status request, GraphQL field/cardinality mismatch, and network/transient errors.
+- Retry only indexing and network/transient states with bounded exponential backoff.
+- Fail immediately on wrong identity, `401`, `403`, actual schema mismatch, invalid GraphQL, destructive compatibility behavior, or an unexpected repository/branch.
+- Run direct Tina Cloud schema/status checks before generating the production admin that uses a same-origin proxy.
+- Sanitize generated Tina files in a `finally` path after every Tina command, including failed commands.
+
+### 20. Generate collection-complete coverage mechanically
+
+- Derive the configured collection set from the exported Tina collection definitions and require exact equality with the fullcheck map.
+- Keep a versioned reflection map for every collection and tested template: fixture document, public route, backend field path, exact public selector or metadata location, expected transformation, and restoration rule.
+- A schema or template-field rename must update the schema, content, handwritten queries, lock, generated artifacts, reflection map, and tests in the same migration.
+- Add a negative omission test that introduces a temporary probe collection and proves the coverage guard fails.
+- Never embed outdated field-name assumptions directly in one-off verification scripts.
+
+### 21. Make route and content-source ownership observable
+
+- Inventory every authoritative fixture against its live route, owning Astro route, template, Tina island, collection, and verification selector before implementation.
+- Test `/`, representative page/article/category/author routes, policy pages, sitemap, RSS, `/admin/`, a non-existent route, and the 404 template.
+- Confirm which route owns `/`; never assume `index.astro` wins over a catch-all route.
+- Loaders should expose a non-secret test diagnostic identifying `tina-cloud` versus `local-fallback`. Fallback may preserve availability but cannot pass cloud/live acceptance.
+- A fresh preview or Passenger process must expose the source/release SHA used to render it so a stale server cannot be mistaken for current output.
+
+### 22. Capture exact-demo evidence once and reuse it
+
+For supplied demos or bundled HTML:
+
+- capture authoritative desktop, phone, and every supplied breakpoint screenshot before changing the implementation;
+- extract and inventory DOM, CSS, assets, fonts, internal font metadata, font weight/width axes, viewport, device-pixel ratio, computed styles, and key section geometry;
+- treat captured PNGs as visual authority when replayed HTML depends on dead `blob:` URLs or missing runtime resets;
+- maintain a complete fixture-to-route/template map covering homepage, generic page, special pages, archives, article, policies, sitemap, 404, header, footer, and shared CTA;
+- generate labeled reference/current/difference images and measured geometry/computed-style reports automatically;
+- verify the listening PID, working directory, process start time, and build SHA before accepting local screenshots.
+
+### 23. Enforce CSS containment and typography mechanically
+
+Automated visual guards must check:
+
+- the dedicated demo host/reset is present and legacy CSS does not supply undeclared body properties;
+- universal box-sizing, margin, padding, and required baseline declarations are replayed after scoped `all: revert`;
+- global header/footer boundaries remain as approved;
+- there is no nested main, duplicated global section, broken image, clipped text, or horizontal overflow;
+- actual font binaries, family names, load state, weights, variable width/stretch axes, line heights, colors, and responsive geometry match the reference.
+
+### 24. Build one immutable candidate and prove its identity
+
+The finalization sequence must:
+
+1. fetch the connected branch and classify all remote-only Tina commits;
+2. verify temporary markers are absent and restored content equals the recorded baseline;
+3. reconcile without force-pushing and rerun sanitization/validation after any rebase;
+4. require a clean worktree and `HEAD == origin/<branch>`;
+5. run direct Cloud schema checks, normal cloud build, Astro diagnostics, dynamic-reflection guards, route/assets/SEO/sitemap checks, visual checks, and secret scans;
+6. run independent read-only gates in parallel after the build;
+7. package only after every pre-package gate passes;
+8. write the full `git rev-parse HEAD` value to `RELEASE_COMMIT`;
+9. reopen the archive, verify its type, contents, byte size, SHA-256, marker, and absence of `.env`, secrets, machine paths, temporary files, source maps, `.git`, and unrelated build artifacts;
+10. generate machine-readable and human-readable release manifests.
+
+The release must fail unless local `HEAD`, remote branch, archive marker, cloud-built candidate, and production `RELEASE_COMMIT` are identical.
+
+### 25. Use a capability-selected, fail-closed deployment
+
+- Select the deployment method from the preflight capability matrix. Prefer direct shell/task execution, then direct API file operations, and use one-shot cron only as a bounded fallback.
+- Prefer documented API2 `Fileman` operations such as `mkdir`, `fileop=extract`, `fileop=unlink`, `fileop=chmod`, and `fileop=copy` when equivalent UAPI functions are unavailable.
+- Never assume a named cPanel endpoint exists; probe it before the release window.
+- Use one reusable, versioned remote release script or manifest-driven command rather than rebuilding a large shell expression for every site.
+- The remote release must lock, validate a regular archive, verify its checksum, create and test a rollback, preserve only the approved server-owned paths, remove the old payload, extract cleanly, verify `RELEASE_COMMIT`, restore `.env` to `0600`, restart only the target Passenger app, and emit a structured result.
+- Cron fallback commands must reject unescaped `%`, omit no fail-fast checks, use a unique operation ID, and always remove the owned cron after completion or failure.
+- Acceptance requires zero migration-owned cron jobs and no stale upload, marker, log, lock, authentication state, helper script, or release staging directory.
+- Retain the newest verified rollback according to policy; remove obsolete migration-owned artifacts only after acceptance.
+
+### 26. Keep a pinned browser acceptance harness
+
+- Maintain a pinned, reusable Playwright environment rather than installing ad hoc browser tooling during each migration.
+- The login helper must handle the Tina `app.tina.io` popup/page/frame flow, return to the original admin, wait for a concrete collection field, verify the intended breadcrumb/form, and protect then delete browser storage state.
+- Every mutation test is atomic: capture → edit → save → backend proof → public proof → restore → backend restoration → public restoration → marker absence.
+- Choose a test field only after mapping it to one unique public selector or metadata location; administrative or masked values are not valid reflection fixtures.
+- If time, tool, or context limits approach, restoration and cleanup outrank starting another test.
+
+### 27. Parallelize only independent verification
+
+After the immutable build, run independent read-only jobs concurrently where supported:
+
+- Git/branch parity;
+- Tina collection and dynamic-reflection checks;
+- route, redirect, asset, RSS, sitemap, and metadata checks;
+- secret/machine-path scans;
+- visual screenshot/computed-style checks;
+- archive inspection.
+
+Keep dependent work serial: fetch/reconcile → build → package → upload → activate → production verification → cleanup. Parallel workers must finish before final generated-file sanitization, staging, packaging, or acceptance.
+
+### 28. Provide one finalization command and one evidence report
+
+The repository should expose or progressively implement a single fail-closed finalization entry point, for example `pnpm migration:finalize`, that performs the applicable Steps 16–27 and stops before any unauthorized external side effect. It must produce:
+
+- `migration-report.json` for machine checks;
+- `migration-report.md` for the release handoff;
+- source, remote, archive, and production SHA equality;
+- archive SHA-256 and byte size;
+- per-collection Publisher transactions;
+- baseline/restoration result;
+- route/assets/SEO/visual results;
+- integration results;
+- rollback location/integrity;
+- remaining temporary artifacts and migration-owned cron count;
+- `PASS`, `FAIL`, or `BLOCKED` for every gate.
+
+A green summary is invalid if its own coverage map, negative tests, or final parity assertion did not run.
+
+### 29. Negative-test the guards
+
+The validation suite must prove that it fails when at least one of the following is introduced in a disposable copy:
+
+- an omitted collection;
+- a hardcoded category/user/navigation option;
+- local-first public content authority;
+- a generated token or machine path;
+- inherited source domain/service identity;
+- missing or stale `tina-lock.json` coverage;
+- mismatched `RELEASE_COMMIT`;
+- a remaining migration-owned cron;
+- a Cloudflare-protected public email;
+- a temporary live-admin marker that was not restored;
+- an unsafe proxy that gives anonymous requests server-token authority.
+
+### 30. Autonomous execution and limit-safe continuation
+
+- Execute all clearly authorized, in-scope, non-destructive migration steps autonomously. Batch independent read-only checks, choose safe defaults, and do not pause merely to ask whether to continue.
+- Automatically continue from one completed gate to the next until the requested migration is complete, blocked by missing access, or would require an unapproved destructive/external side effect.
+- No agent may approve its own platform, security, billing, credential, or hosting authorization prompt. “Auto allow” means avoiding unnecessary confirmation requests and using already granted access; it does not bypass mandatory permission controls or expand the user-approved scope.
+- Before approaching a tool, context, or execution cap such as `150/150`, persist a secret-free checkpoint containing the current SHA, completed gates, active transaction cleanup state, exact remaining steps, and relevant artifact paths.
+- If the runtime supports automatic continuation, resume from that checkpoint without asking the user to type `continue`. If the platform terminates the run or requires a new user turn, do not claim that the limit was bypassed; restore/cleanup first when possible and leave a deterministic continuation checkpoint.
+- On resume, re-read live Git, process, server, and admin state before acting. Never assume a stale checkpoint proves current state, and never repeat an already completed mutation test unless current evidence requires reopening it.
+
 ## Required validator coverage
 
 The repository validator must reject at minimum:
