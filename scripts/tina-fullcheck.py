@@ -96,14 +96,14 @@ class CategoryBadgeParser(HTMLParser):
 class IslandFormParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
-        self.forms: list[dict[str, str | None]] = []
+        self.forms: list[dict] = []
 
     def handle_starttag(self, tag, attrs):
         values = dict(attrs)
         if values.get("data-tina-form") is not None:
             self.forms.append({
                 "form": values.get("data-tina-form"),
-                "primary": values.get("data-tina-primary"),
+                "primary": "data-tina-primary" in values,
                 "island": values.get("data-tina-island"),
             })
 
@@ -173,7 +173,7 @@ def fetch_author_island(failures: list[str]) -> dict:
         return {"status": response.status_code, "path": path, "formCount": 0, "primaryCount": 0, "queryLength": 0, "variables": {}, "hasUserData": False}
 
     parser = IslandFormParser(); parser.feed(response.text)
-    primary = [item for item in parser.forms if item.get("primary") is not None]
+    primary = [item for item in parser.forms if item.get("primary") is True]
     if len(parser.forms) != 1:
         failures.append(f"{AUTHOR_ISLAND_GATE_ID}: expected exactly one author form, got {len(parser.forms)}")
     if len(primary) != 1:
