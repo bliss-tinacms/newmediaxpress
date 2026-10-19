@@ -20,6 +20,9 @@ A local build or `--skip-cloud-checks` build proves only local source integrity.
 When a demo/source is supplied:
 
 - Copy its DOM structure, classes, declarations, fonts, colors, sizes, weights, spacing, section order, assets, and responsive rules exactly.
+- **Always copy the demo’s actual heading font family and body font family.** Discover them from the authoritative demo’s computed styles and font binaries; do not infer them from the old site, an earlier migration, a CSS variable name, or a font import alone.
+- Never reuse or allow inherited legacy heading/body fonts merely because they are already installed or present in shared CSS. Explicitly bind every demo-owned heading and body/text role to the verified demo families, including the required weight, style, stretch/width axis, line height, and letter spacing.
+- Prove the live desktop and mobile computed heading/body font families match the demo. A visually similar fallback or the previous site’s heading family is a failure.
 - Do not redesign, simplify, omit, approximate, or add original styling.
 - Keep the approved global header/footer outside the isolated body host unless replacement is explicitly requested.
 - Put the copied page body under a dedicated host and scoped reset so legacy site CSS cannot contribute undeclared typography, color, decoration, spacing, borders, dimensions, or responsive behavior.
