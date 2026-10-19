@@ -125,6 +125,21 @@ Immediately before push, fetch the Tina-connected branch, inspect remote-only co
 
 ### 13. Run executable TINA-FULLCHECK and PUBLISHER-ADMIN-GATE
 
+**Mandatory regression ID: `AUTHOR-ISLAND-EDITABILITY-001`.** This ID belongs
+to TINA-MIGRATION-GOLD, TINA-FULLCHECK, and PUBLISHER-ADMIN-GATE. Every future
+release must prove that the canonical `/author/<slug>/` route owns a primary
+`author` Tina island and that a preview POST to
+`/tina-island/author?slug=<slug>` returns an authoritative `user` form with
+`query_len > 100`, `variables.relativePath == "<slug>.json"`, user data, and
+exactly one primary marker. HTTP 200, visible preview content, public
+backend-to-SSR parity, or the mere presence of `data-tina-island` cannot pass
+this ID. PUBLISHER-ADMIN-GATE must additionally open that exact author in the
+live visual editor, wait for real User fields, save a temporary visible marker,
+prove authenticated backend and cache-busted public reflection, restore the
+exact original through the UI, and prove backend/public restoration and marker
+absence. Record the ID with PASS, FAIL, or BLOCKED evidence; never omit it from
+a migration report.
+
 Coverage must be derived from the configured Tina collection set and equal the explicit test map. For every configured collection—normally Blog, Page, Category, User, Navigation, and Global Config—use the real live Publisher admin account and run:
 
 1. open the exact document and wait for its real fields;

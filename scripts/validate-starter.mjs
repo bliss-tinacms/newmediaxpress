@@ -54,11 +54,25 @@ const fullcheck = read('scripts/tina-fullcheck.py');
 if (!/CategoryBadgeParser/.test(fullcheck) || !/actual_categories\s*!=\s*expected_categories/.test(fullcheck) || !/len\(expected_categories\)\s*<\s*2/.test(fullcheck)) {
   fail('TINA-FULLCHECK must compare the complete backend category array with all public article badges using a two-category fixture.');
 }
+if (!/AUTHOR-ISLAND-EDITABILITY-001/.test(fullcheck) || !/fetch_author_island/.test(fullcheck) || !/queryLength/.test(fullcheck) || !/primaryCount/.test(fullcheck)) {
+  fail('TINA-FULLCHECK must enforce AUTHOR-ISLAND-EDITABILITY-001 with real query, variables, user data, and one primary form.');
+}
 const multiCatFixture = read('src/content/blog/why-grocery-prices-stopped-falling-in-september.mdx').split('---')[1] || '';
 const fixtureCategoryBlock = multiCatFixture.match(/categories:\s*\n((?:\s+-\s+[^\n]+\n?)+)/)?.[1] || '';
 if ((fixtureCategoryBlock.match(/^\s+-\s+/gm) || []).length < 2) fail('MULTICAT-LOCK fixture must retain at least two categories.');
 
 const authorArchive = read('src/components/demo/DemoAuthorArchive.astro');
+const authorRoute = read('src/pages/author/[...slug].astro');
+const dataSource = read('src/lib/data.ts');
+if (!/<TinaIsland\s+name=["']author["'][\s\S]{0,200}params=\{\{\s*slug:\s*parsed\.slug\s*\}\}[\s\S]{0,100}primary/.test(authorRoute)) {
+  fail('AUTHOR-ISLAND-EDITABILITY-001 requires the canonical author route to own a primary author TinaIsland.');
+}
+if (/return\s+await\s+requestWithMetadata\(client\.queries\.user\(/.test(dataSource)) {
+  fail('AUTHOR-ISLAND-EDITABILITY-001 forbids passing an unresolved generated User request into requestWithMetadata.');
+}
+if (!/fetchLiveTinaResult<\{ user: any \}>\(UserDocument/.test(dataSource) || !/Author editor query returned no authoritative Tina document/.test(dataSource)) {
+  fail('AUTHOR-ISLAND-EDITABILITY-001 requires direct authoritative User metadata and fail-closed generated fallback validation.');
+}
 const nmxCss = read('src/styles/newmediaxpress.css');
 if (/<small>\s*(?:Latest|\{author\.latestLabel\})\s*<\/small>/.test(authorArchive)) {
   fail('ASTRO-DEMO-LOCK forbids the extra Latest pill in the Jessica author lead story.');
@@ -139,10 +153,18 @@ else {
     ['Build and deploy one immutable release', 'atomic immutable deployment gate'],
     ['TINA-FULLCHECK', 'collection-complete fullcheck gate'],
     ['PUBLISHER-ADMIN-GATE', 'authenticated live-admin acceptance gate'],
+    ['AUTHOR-ISLAND-EDITABILITY-001', 'author island editability regression gate'],
     ['exact restoration', 'reversible cleanup gate'],
   ];
   for (const [needle, label] of requiredGates) {
     if (!processDocument.includes(needle)) fail(`TINA-MIGRATION-GOLD.md is missing the ${label}.`);
+  }
+}
+if (!existsSync(join(root, 'PUBLISHER-ADMIN-GATE.md'))) fail('PUBLISHER-ADMIN-GATE.md is required for authenticated live-admin acceptance.');
+else {
+  const publisherGate = read('PUBLISHER-ADMIN-GATE.md');
+  for (const needle of ['AUTHOR-ISLAND-EDITABILITY-001', 'query', 'variables.relativePath', 'temporary marker', 'Restore the exact original']) {
+    if (!publisherGate.includes(needle)) fail(`PUBLISHER-ADMIN-GATE.md is missing ${needle}.`);
   }
 }
 for (const path of walk(root)) {

@@ -1,7 +1,9 @@
 ---
 import Base from '../../layouts/Base.astro';
+import TinaIsland from '@tinacms/astro/TinaIsland.astro';
 import DemoAuthorArchive from '../../components/demo/DemoAuthorArchive.astro';
 import { getConfig, getUser, listBlogs } from '../../lib/data';
+import { islands } from '../../lib/islands';
 
 const POSTS_PER_PAGE = 7;
 
@@ -110,5 +112,7 @@ const description = authorSeo?.metaDescription || editableAuthor?.bio || 'Read t
 	noindex={authorSeo?.noindex || false}
 	nofollow={authorSeo?.nofollow || false}
 >
-	<DemoAuthorArchive archiveTitle={archiveTitle} author={editableAuthor || authorObject} posts={posts} currentPage={currentPage} totalPages={totalPages} basePath={basePath} />
+	<TinaIsland name="author" wrapper={islands.author.wrapper} params={{ slug: parsed.slug }} primary>
+		<DemoAuthorArchive archiveTitle={archiveTitle} author={editableAuthor || authorObject} posts={posts} currentPage={currentPage} totalPages={totalPages} basePath={basePath} />
+	</TinaIsland>
 </Base>

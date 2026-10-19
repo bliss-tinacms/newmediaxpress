@@ -590,27 +590,20 @@ async function getLiveUser(slug: string) {
 
 export const getEditableUser = async (slug: string) => {
 	const relativePath = slug.endsWith('.json') ? slug : `${slug}.json`;
-	try {
-		return await requestWithMetadata(client.queries.user({ relativePath }), { priority: 'primary' });
-	} catch (error) {
-		const live = await fetchLiveTinaResult<{ user: any }>(UserDocument, { relativePath });
-		if (live?.data?.user) {
-			return requestWithMetadata(Promise.resolve({
-				data: live.data,
-				query: UserDocument,
-				variables: { relativePath },
-			}), { priority: 'primary' });
-		}
-		const localUser = readLocalJson('user', relativePath);
-		if (localUser) {
-			return requestWithMetadata(Promise.resolve({
-				data: { user: localUser as any },
-				query: UserDocument,
-				variables: { relativePath },
-			}), { priority: 'primary' });
-		}
-		throw error;
+	// AUTHOR-ISLAND-EDITABILITY-001: fetch Tina Cloud directly before metadata
+	// enrichment. Passing an unresolved generated-client promise into
+	// requestWithMetadata can turn a transport rejection into a hollow HTTP-200
+	// form with query="" and variables={}, leaving the live sidebar empty.
+	const live = await fetchLiveTinaResult<{ user: any }>(UserDocument, { relativePath });
+	if (live?.data?.user) {
+		return requestWithMetadata(Promise.resolve(live), { priority: 'primary' });
 	}
+
+	const generated = await client.queries.user({ relativePath });
+	if (!generated?.data?.user || !generated.query || !generated.variables) {
+		throw new Error(`Author editor query returned no authoritative Tina document: ${relativePath}`);
+	}
+	return requestWithMetadata(generated, { priority: 'primary' });
 };
 
 export const getUser = (slug: string) => getLiveUser(slug);

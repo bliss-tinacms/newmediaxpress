@@ -29,6 +29,8 @@ if not CLIENT_ID or not TOKEN:
 TINA_URL = f"https://content.tinajs.io/2.4/content/{CLIENT_ID}/github/{BRANCH}"
 REQUIRED = {"blog", "page", "category", "user", "navigation", "config"}
 SEO_FIELDS = "metaTitle metaDescription ogTitle ogDescription ogImage canonicalUrl noindex nofollow"
+AUTHOR_ISLAND_GATE_ID = "AUTHOR-ISLAND-EDITABILITY-001"
+AUTHOR_FIXTURE_SLUG = "donna-shelton"
 
 
 class DocumentParser(HTMLParser):
@@ -91,6 +93,21 @@ class CategoryBadgeParser(HTMLParser):
             self.current = None
 
 
+class IslandFormParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.forms: list[dict[str, str | None]] = []
+
+    def handle_starttag(self, tag, attrs):
+        values = dict(attrs)
+        if values.get("data-tina-form") is not None:
+            self.forms.append({
+                "form": values.get("data-tina-form"),
+                "primary": values.get("data-tina-primary"),
+                "island": values.get("data-tina-island"),
+            })
+
+
 def configured_collections() -> set[str]:
     root = Path(__file__).resolve().parents[1] / "tina" / "collections"
     found = set()
@@ -109,7 +126,7 @@ def query_backend() -> dict:
       blogs: blogConnection(first: 100) {{ edges {{ node {{ categories }} }} }}
       page(relativePath: "home.mdx") {{ title seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       category(relativePath: "Business.json") {{ title description seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
-      user(relativePath: "carol-burke.json") {{ name role bio seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
+      user(relativePath: "{AUTHOR_FIXTURE_SLUG}.json") {{ name role bio seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       navigation(relativePath: "header.json") {{ title items {{ label href children {{ label href }} }} _sys {{ filename }} }}
       config(relativePath: "config.json") {{
         headerNavigation {{ ... on Navigation {{ _sys {{ relativePath }} }} }}
@@ -136,6 +153,59 @@ def fetch_route(path: str) -> dict:
     response.encoding = "utf-8"
     parser = DocumentParser(); parser.feed(response.text)
     return {"status": response.status_code, "cache": response.headers.get("cf-cache-status"), "html": unescape(response.text), "head": parser}
+
+
+def fetch_author_island(failures: list[str]) -> dict:
+    path = f"/tina-island/author?slug={AUTHOR_FIXTURE_SLUG}"
+    response = requests.post(
+        f"{SITE}{path}",
+        headers={
+            "Content-Type": "application/x-tina-preview+json",
+            "X-Tina-Prime": "1",
+            "Sec-Fetch-Site": "same-origin",
+            "Cache-Control": "no-cache",
+        },
+        data="{}",
+        timeout=45,
+    )
+    if response.status_code != 200:
+        failures.append(f"{AUTHOR_ISLAND_GATE_ID}: island returned HTTP {response.status_code}")
+        return {"status": response.status_code, "path": path, "formCount": 0, "primaryCount": 0, "queryLength": 0, "variables": {}, "hasUserData": False}
+
+    parser = IslandFormParser(); parser.feed(response.text)
+    primary = [item for item in parser.forms if item.get("primary") is not None]
+    if len(parser.forms) != 1:
+        failures.append(f"{AUTHOR_ISLAND_GATE_ID}: expected exactly one author form, got {len(parser.forms)}")
+    if len(primary) != 1:
+        failures.append(f"{AUTHOR_ISLAND_GATE_ID}: expected exactly one primary author form, got {len(primary)}")
+
+    form_payload: dict = {}
+    if parser.forms:
+        try:
+            form_payload = json.loads(parser.forms[0].get("form") or "{}")
+        except json.JSONDecodeError as error:
+            failures.append(f"{AUTHOR_ISLAND_GATE_ID}: invalid data-tina-form JSON: {error}")
+    query = str(form_payload.get("query") or "")
+    raw_variables = form_payload.get("variables")
+    raw_data = form_payload.get("data")
+    variables: dict = raw_variables if isinstance(raw_variables, dict) else {}
+    data: dict = raw_data if isinstance(raw_data, dict) else {}
+    if len(query) <= 100:
+        failures.append(f"{AUTHOR_ISLAND_GATE_ID}: author form query must exceed 100 characters, got {len(query)}")
+    expected_relative_path = f"{AUTHOR_FIXTURE_SLUG}.json"
+    if variables.get("relativePath") != expected_relative_path:
+        failures.append(f"{AUTHOR_ISLAND_GATE_ID}: expected variables.relativePath={expected_relative_path!r}, got {variables!r}")
+    if not isinstance(data.get("user"), dict):
+        failures.append(f"{AUTHOR_ISLAND_GATE_ID}: author form contains no authoritative user data")
+    return {
+        "status": response.status_code,
+        "path": path,
+        "formCount": len(parser.forms),
+        "primaryCount": len(primary),
+        "queryLength": len(query),
+        "variables": variables,
+        "hasUserData": isinstance(data.get("user"), dict),
+    }
 
 
 def values(items: list[dict], key: str, name: str) -> list[str]:
@@ -190,8 +260,9 @@ def main() -> int:
         "page": fetch_route("/"),
         "blog": fetch_route("/why-grocery-prices-stopped-falling-in-september/"),
         "category": fetch_route("/business/"),
-        "user": fetch_route("/author/carol-burke/"),
+        "user": fetch_route(f"/author/{AUTHOR_FIXTURE_SLUG}/"),
     }
+    author_island = fetch_author_island(failures)
     config, page, blog, category, user = data["config"], data["page"], data["blog"], data["category"], data["user"]
     site_title = config.get("seo", {}).get("title") or "New Media Xpress"
     business_post_count = sum(
@@ -207,7 +278,7 @@ def main() -> int:
         "page": assert_seo("page", routes["page"], page.get("seo"), page.get("title") or site_title, config.get("seo", {}).get("description") or "", f"{SITE}/", failures),
         "blog": assert_seo("blog", routes["blog"], blog.get("seo"), blog.get("title") or "", blog.get("description") or "", "/why-grocery-prices-stopped-falling-in-september/", failures),
         "category": assert_seo("category", routes["category"], category.get("seo"), f"{category.get('title')} Articles | {site_title}", category_description, "/business/", failures),
-        "user": assert_seo("user", routes["user"], user.get("seo"), f"{user.get('name')} Articles | {site_title}", user.get("bio") or f"Read the latest articles by {user.get('name')} from New Media Xpress.", "/author/carol-burke/", failures),
+        "user": assert_seo("user", routes["user"], user.get("seo"), f"{user.get('name')} Articles | {site_title}", user.get("bio") or f"Read the latest articles by {user.get('name')} from New Media Xpress.", f"/author/{AUTHOR_FIXTURE_SLUG}/", failures),
     }
     assert_text("blog.title", routes["blog"]["html"], blog.get("title") or "", failures)
     expected_categories = [category_badge(value) for value in (blog.get("categories") or [])]
@@ -220,13 +291,18 @@ def main() -> int:
     assert_text("category.title", routes["category"]["html"], category.get("title") or "", failures)
     assert_text("user.name", routes["user"]["html"], user.get("name") or "", failures)
     assert_text("user.role", routes["user"]["html"], user.get("role") or "", failures)
+    expected_island_path = f"/tina-island/author?slug={AUTHOR_FIXTURE_SLUG}"
+    if expected_island_path not in routes["user"]["html"]:
+        failures.append(f"{AUTHOR_ISLAND_GATE_ID}: canonical author route does not render its author island")
     assert_text("navigation.items[0].label", routes["page"]["html"], data["navigation"]["items"][0]["label"], failures)
     assert_text("config.seo.title", routes["page"]["html"], config.get("seo", {}).get("title") or "", failures)
     config_logo = config.get("seo", {}).get("logo") or ""
     if config_logo:
         assert_text("config.seo.logo", routes["page"]["html"], config_logo, failures)
 
-    report = {"site": SITE, "configuredCollections": sorted(configured), "requiredCollections": sorted(REQUIRED), "coverageComplete": configured == REQUIRED, "collections": {name: {"backendDocument": data.get(name, {}).get("_sys", {}).get("filename"), "status": "PASS" if data.get(name) else "FAIL"} for name in sorted(REQUIRED)}, "routes": {name: {"status": route["status"], "cache": route["cache"]} for name, route in routes.items()}, "seo": seo_results, "multicat": {"backend": expected_categories, "public": actual_categories, "exactMatch": actual_categories == expected_categories and len(expected_categories) >= 2}, "failures": failures}
+    author_island["id"] = AUTHOR_ISLAND_GATE_ID
+    author_island["status"] = "PASS" if not any(AUTHOR_ISLAND_GATE_ID in failure for failure in failures) else "FAIL"
+    report = {"site": SITE, "gateIds": [AUTHOR_ISLAND_GATE_ID], "configuredCollections": sorted(configured), "requiredCollections": sorted(REQUIRED), "coverageComplete": configured == REQUIRED, "collections": {name: {"backendDocument": data.get(name, {}).get("_sys", {}).get("filename"), "status": "PASS" if data.get(name) else "FAIL"} for name in sorted(REQUIRED)}, "routes": {name: {"status": route["status"], "cache": route["cache"]} for name, route in routes.items()}, "islands": {"author": author_island}, "seo": seo_results, "multicat": {"backend": expected_categories, "public": actual_categories, "exactMatch": actual_categories == expected_categories and len(expected_categories) >= 2}, "failures": failures}
     print(json.dumps(report, ensure_ascii=False, indent=2))
     print(f"TINA_FULLCHECK_OK {not failures}")
     return 0 if not failures else 1
