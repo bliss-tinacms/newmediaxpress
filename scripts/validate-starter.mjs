@@ -64,8 +64,10 @@ if (/<small>\s*(?:Latest|\{author\.latestLabel\})\s*<\/small>/.test(authorArchiv
   fail('ASTRO-DEMO-LOCK forbids the extra Latest pill in the Jessica author lead story.');
 }
 for (const requiredRule of [
+  '.nx-author .nx-author-hero__inner>div>span{align-self:flex-start}',
+  '.nx-author .nx-lead-story{padding-bottom:clamp(48px,6vw,80px)}',
   '.nx-author .nx-author-hero__inner{padding-top:clamp(56px,5.625vw,87px);padding-bottom:24px}',
-  '.nx-author .nx-lead-story{padding:0 0 0 clamp(32px,4.7vw,68px)}',
+  '.nx-author .nx-lead-story{padding:clamp(48px,6vw,80px) 0 clamp(48px,6vw,80px) clamp(32px,4.7vw,68px)}',
   '.nx-author .nx-lead-story>a{grid-template-columns:repeat(2,minmax(0,620px));align-items:start}',
   '.nx-author .nx-lead-story>a>img{aspect-ratio:20/9}',
 ]) {

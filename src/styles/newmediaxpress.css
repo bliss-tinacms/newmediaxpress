@@ -204,11 +204,13 @@ html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--nx-ink);fo
 @media(max-width:600px){.ah-dt{width:100%!important;margin-left:66px!important}.bd .corr{padding:24px!important}.bd .corr>img,.bd .corr-avatar{width:96px!important;height:96px!important}.bd .corr-b{grid-column:auto}.pr blockquote{padding:0!important}}
 
 /* ASTRO-DEMO-LOCK: Jessica author fixture. The desktop reference uses a
-   compact 338px author hero and a flush 20:9 lead story with no "Latest"
-   pill. Keep these rules scoped to the author template. */
+   compact author hero and a 20:9 lead story with no "Latest" pill. Keep
+   the role pill content-sized and separate each major section visibly. */
+.nx-author .nx-author-hero__inner>div>span{align-self:flex-start}
+.nx-author .nx-lead-story{padding-bottom:clamp(48px,6vw,80px)}
 @media (min-width:901px){
   .nx-author .nx-author-hero__inner{padding-top:clamp(56px,5.625vw,87px);padding-bottom:24px}
-  .nx-author .nx-lead-story{padding:0 0 0 clamp(32px,4.7vw,68px)}
+  .nx-author .nx-lead-story{padding:clamp(48px,6vw,80px) 0 clamp(48px,6vw,80px) clamp(32px,4.7vw,68px)}
   .nx-author .nx-lead-story>a{grid-template-columns:repeat(2,minmax(0,620px));align-items:start}
   .nx-author .nx-lead-story>a>img{aspect-ratio:20/9}
 }
