@@ -7,7 +7,7 @@
     "description": "Important stories made clear through careful sourcing and meaningful context.",
     "siteOwner": "Brian Caldwell",
     "logo": "/images/newmediaxpress/a0ac5c71a06a9c052d01c6bcff145d8a8523dfc65afeb39dba239bd44db60b90.png",
-    "favicon": "/favicon.svg",
+    "favicon": "https://res.cloudinary.com/lsu0eziv/image/upload/v1792413129/newmediaxpress/favicon.png",
     "footerLogo": "/images/newmediaxpress/a0ac5c71a06a9c052d01c6bcff145d8a8523dfc65afeb39dba239bd44db60b90.png"
   },
   "globalText": {
@@ -59,8 +59,16 @@
     "footerCode": ""
   },
   "contactLinks": [
-    { "title": "Editorial", "link": "mailto:editorial@newmediaxpress.com", "icon": "mail" },
-    { "title": "General Inquiries", "link": "mailto:info@newmediaxpress.com", "icon": "mail" }
+    {
+      "title": "Editorial",
+      "link": "mailto:editorial@newmediaxpress.com",
+      "icon": "mail"
+    },
+    {
+      "title": "General Inquiries",
+      "link": "mailto:info@newmediaxpress.com",
+      "icon": "mail"
+    }
   ],
   "footerStarfield": false
 }
