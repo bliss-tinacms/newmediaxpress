@@ -47,9 +47,13 @@ class TextExtractor(HTMLParser):
         key = None
         if tag == "b" and "ph-k" in parent_classes:
             key = "hero_eyebrow"
+        elif tag == "span" and parent_classes.intersection({"nx-about-crumb", "nx-team-crumb", "nx-contact__crumb"}):
+            key = "hero_eyebrow"
         elif tag == "h1":
             key = "hero_headline"
         elif tag == "h2":
+            key = "section_title"
+        elif tag == "p" and "nx-team-kicker" in classes:
             key = "section_title"
 
         if key:
@@ -131,13 +135,13 @@ CHECKS = [
         "query": """
         query Page($relativePath: String!) {
           page(relativePath: $relativePath) {
-            blocks { __typename ... on PageBlocksContactMockup17 { hero { eyebrow headline } formSection { title } } }
+            blocks { __typename ... on PageBlocksContactMockup17 { hero { breadcrumbCurrent headlineLead headlineAccent } formSection { title } } }
           }
         }
         """,
         "expected": lambda data: {
-            "hero_eyebrow": data["page"]["blocks"][0]["hero"]["eyebrow"],
-            "hero_headline": data["page"]["blocks"][0]["hero"]["headline"],
+            "hero_eyebrow": data["page"]["blocks"][0]["hero"]["breadcrumbCurrent"],
+            "hero_headline": f'{data["page"]["blocks"][0]["hero"]["headlineLead"]} {data["page"]["blocks"][0]["hero"]["headlineAccent"]}',
             "section_title": data["page"]["blocks"][0]["formSection"]["title"],
         },
     },
@@ -148,14 +152,14 @@ CHECKS = [
         "query": """
         query Page($relativePath: String!) {
           page(relativePath: $relativePath) {
-            blocks { __typename ... on PageBlocksOurTeamMockup17 { hero { eyebrow headline } leadership { title } } }
+            blocks { __typename ... on PageBlocksOurTeamMockup17 { hero { eyebrow headline } leadership { eyebrow } } }
           }
         }
         """,
         "expected": lambda data: {
             "hero_eyebrow": data["page"]["blocks"][0]["hero"]["eyebrow"],
             "hero_headline": data["page"]["blocks"][0]["hero"]["headline"],
-            "section_title": data["page"]["blocks"][0]["leadership"]["title"],
+            "section_title": data["page"]["blocks"][0]["leadership"]["eyebrow"],
         },
     },
 ]
