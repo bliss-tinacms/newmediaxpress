@@ -45,6 +45,19 @@ else {
   if (!/input\.onChange/.test(field)) fail('Category UI must update Tina form state through input.onChange.');
 }
 
+const blogBody = read('src/components/islands/BlogBody.astro');
+if (/primaryCategory|categoryItems\.find\s*\(/.test(blogBody)) fail('MULTICAT-LOCK forbids choosing one primary category for the public article header.');
+if (!/categoryBadges\.map\s*\(/.test(blogBody) || !/ah-k__item/.test(blogBody) || !/data-category-count/.test(blogBody)) {
+  fail('MULTICAT-LOCK requires one public article badge/link for every selected category.');
+}
+const fullcheck = read('scripts/tina-fullcheck.py');
+if (!/CategoryBadgeParser/.test(fullcheck) || !/actual_categories\s*!=\s*expected_categories/.test(fullcheck) || !/len\(expected_categories\)\s*<\s*2/.test(fullcheck)) {
+  fail('TINA-FULLCHECK must compare the complete backend category array with all public article badges using a two-category fixture.');
+}
+const multiCatFixture = read('src/content/blog/why-grocery-prices-stopped-falling-in-september.mdx').split('---')[1] || '';
+const fixtureCategoryBlock = multiCatFixture.match(/categories:\s*\n((?:\s+-\s+[^\n]+\n?)+)/)?.[1] || '';
+if ((fixtureCategoryBlock.match(/^\s+-\s+/gm) || []).length < 2) fail('MULTICAT-LOCK fixture must retain at least two categories.');
+
 const proxy = read('src/pages/tina-content-proxy.ts');
 if (/updateBlog|category-overrides|normalizeCategories|persistLocal|stripConfig|overrideBlogResponse/.test(proxy)) {
   fail('Tina proxy contains collection-specific compatibility or persistence logic.');
@@ -104,6 +117,7 @@ else {
     ['Query the verified Tina destination first', 'destination Tina endpoint and identity gate'],
     ['Treat schema changes as migrations', 'schema/lock/cloud migration gate'],
     ['MULTICAT-LOCK', 'multi-category preservation gate'],
+    ['one demo record shows one category', 'demo-cardinality must not collapse multi-category output'],
     ['Keep public email addresses ordinary', 'public email anti-obfuscation gate'],
     ['Build and deploy one immutable release', 'atomic immutable deployment gate'],
     ['TINA-FULLCHECK', 'collection-complete fullcheck gate'],

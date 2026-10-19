@@ -57,6 +57,40 @@ class DocumentParser(HTMLParser):
         if self.in_title: self._title.append(data)
 
 
+class CategoryBadgeParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.current: dict[str, str | list[str]] | None = None
+        self.badges: list[dict[str, str]] = []
+
+    def handle_starttag(self, tag, attrs):
+        values = dict(attrs)
+        classes = str(values.get("class") or "").split()
+        if tag == "a" and "ah-k__item" in classes:
+            self.current = {
+                "slug": str(values.get("data-category-slug") or ""),
+                "href": str(values.get("href") or ""),
+                "text": [],
+            }
+
+    def handle_data(self, data):
+        if self.current is not None:
+            text = self.current["text"]
+            assert isinstance(text, list)
+            text.append(data)
+
+    def handle_endtag(self, tag):
+        if tag == "a" and self.current is not None:
+            text = self.current["text"]
+            assert isinstance(text, list)
+            self.badges.append({
+                "slug": str(self.current["slug"]),
+                "href": str(self.current["href"]),
+                "label": "".join(text).strip(),
+            })
+            self.current = None
+
+
 def configured_collections() -> set[str]:
     root = Path(__file__).resolve().parents[1] / "tina" / "collections"
     found = set()
@@ -71,7 +105,7 @@ def configured_collections() -> set[str]:
 def query_backend() -> dict:
     query = f"""
     query AllCollectionFullcheck {{
-      blog(relativePath: "why-grocery-prices-stopped-falling-in-september.mdx") {{ title description seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
+      blog(relativePath: "why-grocery-prices-stopped-falling-in-september.mdx") {{ title description categories seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       blogs: blogConnection(first: 100) {{ edges {{ node {{ categories }} }} }}
       page(relativePath: "home.mdx") {{ title seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
       category(relativePath: "Business.json") {{ title description seo {{ {SEO_FIELDS} }} _sys {{ filename }} }}
@@ -114,6 +148,13 @@ def exact_one(label: str, actual: list[str], expected: str, failures: list[str])
 
 def assert_text(label: str, html: str, expected: str, failures: list[str]) -> None:
     if expected and expected.casefold() not in html.casefold(): failures.append(f"{label}: backend value absent from public SSR HTML")
+
+
+def category_badge(value: str) -> dict[str, str]:
+    filename = str(value).replace("\\", "/").rsplit("/", 1)[-1]
+    label = re.sub(r"\.(json|mdx?)$", "", filename, flags=re.I).replace("-", " ").strip()
+    slug = re.sub(r"[^a-z0-9]+", "-", label.casefold()).strip("-")
+    return {"label": label, "slug": slug, "href": f"/{slug}/"}
 
 
 def assert_seo(label: str, route: dict, seo: dict | None, title_fallback: str, description_fallback: str, canonical_fallback: str, failures: list[str]) -> dict:
@@ -169,6 +210,13 @@ def main() -> int:
         "user": assert_seo("user", routes["user"], user.get("seo"), f"{user.get('name')} Articles | {site_title}", user.get("bio") or f"Read the latest articles by {user.get('name')} from New Media Xpress.", "/author/carol-burke/", failures),
     }
     assert_text("blog.title", routes["blog"]["html"], blog.get("title") or "", failures)
+    expected_categories = [category_badge(value) for value in (blog.get("categories") or [])]
+    category_parser = CategoryBadgeParser(); category_parser.feed(routes["blog"]["html"])
+    actual_categories = category_parser.badges
+    if len(expected_categories) < 2:
+        failures.append(f"MULTICAT-LOCK fixture must contain at least two backend categories, got {expected_categories!r}")
+    if actual_categories != expected_categories:
+        failures.append(f"MULTICAT-LOCK public category badges must exactly match every backend category in order: expected={expected_categories!r}, got={actual_categories!r}")
     assert_text("category.title", routes["category"]["html"], category.get("title") or "", failures)
     assert_text("user.name", routes["user"]["html"], user.get("name") or "", failures)
     assert_text("user.role", routes["user"]["html"], user.get("role") or "", failures)
@@ -178,7 +226,7 @@ def main() -> int:
     if config_logo:
         assert_text("config.seo.logo", routes["page"]["html"], config_logo, failures)
 
-    report = {"site": SITE, "configuredCollections": sorted(configured), "requiredCollections": sorted(REQUIRED), "coverageComplete": configured == REQUIRED, "collections": {name: {"backendDocument": data.get(name, {}).get("_sys", {}).get("filename"), "status": "PASS" if data.get(name) else "FAIL"} for name in sorted(REQUIRED)}, "routes": {name: {"status": route["status"], "cache": route["cache"]} for name, route in routes.items()}, "seo": seo_results, "failures": failures}
+    report = {"site": SITE, "configuredCollections": sorted(configured), "requiredCollections": sorted(REQUIRED), "coverageComplete": configured == REQUIRED, "collections": {name: {"backendDocument": data.get(name, {}).get("_sys", {}).get("filename"), "status": "PASS" if data.get(name) else "FAIL"} for name in sorted(REQUIRED)}, "routes": {name: {"status": route["status"], "cache": route["cache"]} for name, route in routes.items()}, "seo": seo_results, "multicat": {"backend": expected_categories, "public": actual_categories, "exactMatch": actual_categories == expected_categories and len(expected_categories) >= 2}, "failures": failures}
     print(json.dumps(report, ensure_ascii=False, indent=2))
     print(f"TINA_FULLCHECK_OK {not failures}")
     return 0 if not failures else 1

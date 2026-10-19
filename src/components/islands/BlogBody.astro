@@ -152,8 +152,14 @@ const authorSlug = getReferenceSlug(data?.author) || getReferenceSlug(author);
 const authorArchiveUrl = authorSlug ? `/author/${authorSlug}/` : '/blog/';
 const authorInitials = authorName.split(/\s+/).filter(Boolean).slice(0, 2).map((part) => part[0]?.toUpperCase()).join('') || 'SS';
 const categoryItems = getReferenceItems(getPostCategories(data));
-const primaryCategory = categoryItems.find((item) => slugify(getSingleReferenceLabel(item) || '') !== 'featured') || categoryItems[0];
-const categoryLabel = getSingleReferenceLabel(primaryCategory) || 'Article';
+const categoryBadges = categoryItems
+	.map((item) => {
+		const label = getSingleReferenceLabel(item);
+		const slug = slugify(getReferenceSlug(item) || label || '');
+		return label && slug ? { label, slug, href: `/${slug}/` } : null;
+	})
+	.filter((item): item is { label: string; slug: string; href: string } => Boolean(item))
+	.filter((item, index, items) => items.findIndex((candidate) => candidate.slug === item.slug) === index);
 const publishedDate = data?.pubDate ? new Date(data.pubDate) : getFallbackPublishedDate(data);
 
 const tocItems = getTocItems(data?.body);
@@ -179,9 +185,11 @@ const heroImageAlt = (() => {
 		<header class="ah">
 			<div class="w">
 				<div class="ah-in">
-					{categoryLabel && (
-						<div data-tina-field={tinaField(data, 'categories')} class="ah-k">
-							<b>{categoryLabel}</b>
+					{categoryBadges.length > 0 && (
+						<div data-tina-field={tinaField(data, 'categories')} class="ah-k" aria-label="Article categories" data-category-count={categoryBadges.length}>
+							{categoryBadges.map((category) => (
+								<a class="ah-k__item" data-category-slug={category.slug} href={category.href}>{category.label}</a>
+							))}
 						</div>
 					)}
 					{data.title && <h1 data-tina-field={tinaField(data, 'title')}>{data.title}</h1>}

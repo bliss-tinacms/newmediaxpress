@@ -85,7 +85,11 @@ Then run generation, sanitize generated clients, commit/push, wait for Tina Clou
 - Header/footer roles reference Navigation documents through Global Config; runtime code must not depend on fixed filenames.
 - Category choices come from the authenticated paginated Category collection, never a source-code list.
 - If native multi-reference lists fail the active Tina version, store a string list and use a tested custom field that saves canonical `_sys.path`, preserves unavailable selections, supports refresh, and calls `input.onChange`.
-- Open a post with at least two categories, prove both remain selected, save a temporary category assignment, verify public reflection, then restore exactly. Never reduce an existing array to one category.
+- **A demo in which one demo record shows one category is only one data instance. It never authorizes singular schema, `primaryCategory`, first-item-only rendering, exclusion of `Featured`, or any other reduction of a multi-category array.** Preserve the demo badge design by repeating it once for every selected category.
+- Every selected category must render publicly as its own visible, linked badge with the correct archive URL. No selected category may be hidden merely because another category is considered primary, editorial, featured, or visually preferred.
+- Keep a committed fixture with at least two categories. `TINA-FULLCHECK` must query that complete backend array and compare it with the dedicated public article-category DOM: exact count, ordered normalized labels, slugs, and archive links. Whole-page text searches and category-archive counts do not satisfy this gate.
+- The source validator must fail on singular-selection patterns such as `primaryCategory`, category-array `.find(...)`, or first-item-only article-header rendering, and must fail if the executable fullcheck loses its two-category cardinality assertion.
+- Open a post with at least two categories, prove all remain selected, change the category set in the live admin, save, query authenticated Tina, verify every selected category on the public article frontend, then restore the exact original array and prove backend/admin/public restoration. Never reduce an existing array to one category.
 
 ### 8. Preserve rich-text fidelity
 

@@ -200,8 +200,8 @@ a:hover{color:var(--org2)}
 /* ARTICLE HEAD */
 .ah{background:var(--blk);color:#fff;padding:58px 0 54px}
 .ah-in{max-width:none}
-.ah-k{display:inline-flex;align-items:center;margin-bottom:22px}
-.ah-k b{background:var(--org);color:#12100E;font-family:var(--cnd);font-size:15px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:7px 15px}
+.ah-k{display:inline-flex;align-items:center;flex-wrap:wrap;gap:10px;margin-bottom:22px}
+.ah-k b,.ah-k__item{display:inline-flex;background:var(--org);color:#12100E;font-family:var(--cnd);font-size:15px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;padding:7px 15px;text-decoration:none}
 .ah h1{font-family:var(--dsp);font-size:70px;font-weight:800;letter-spacing:-.012em;line-height:.95;text-transform:uppercase;color:#fff;margin-bottom:30px;text-wrap:pretty}
 .ah-by{display:flex;flex-wrap:wrap;align-items:center;gap:16px 0;padding-top:22px;border-top:1px solid rgba(255,255,255,.22)}
 .ah-av{width:52px;height:52px;object-fit:cover;object-position:center;display:block;flex:none;margin-right:16px;background:var(--blk2)}
