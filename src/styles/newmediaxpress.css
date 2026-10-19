@@ -202,3 +202,13 @@ html{scroll-behavior:smooth}body{margin:0;background:#fff;color:var(--nx-ink);fo
 .mo{padding:0!important;border:0!important;background:var(--nx-sky)!important}.mo>.w{padding-top:clamp(56px,7vw,96px);padding-bottom:clamp(56px,7vw,96px)}.mo .h2{margin:0 0 32px!important;font-size:clamp(40px,5vw,68px)!important;font-weight:900!important;font-stretch:75%;line-height:.92!important;letter-spacing:-.02em!important}.mo-g{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))!important;gap:28px!important;margin:0!important}.mo .mi{gap:12px!important}.mo .mi-c{display:contents!important}.mo .mi-img{aspect-ratio:4/3!important}.mo .mi-k{margin:0!important;font-family:ArchivoNX,Archivo,Arial,sans-serif!important;color:var(--nx-blue)!important;font-size:13px!important;font-weight:800!important;letter-spacing:.08em!important}.mo .mi-h{margin:0!important}.mo .mi-x{margin:0!important;font-size:15px!important}
 @media(max-width:1023px){.bd-in{display:flex!important;flex-direction:column;align-items:stretch}.rl{display:contents!important}.li{order:0;max-width:none}.toc{order:1}.pr{order:2;max-width:none}.rl .standards-card{order:3}.ah-dt{width:auto!important;margin:0!important}.mo-g{grid-template-columns:repeat(auto-fit,minmax(min(100%,280px),1fr))!important}}
 @media(max-width:600px){.ah-dt{width:100%!important;margin-left:66px!important}.bd .corr{padding:24px!important}.bd .corr>img,.bd .corr-avatar{width:96px!important;height:96px!important}.bd .corr-b{grid-column:auto}.pr blockquote{padding:0!important}}
+
+/* ASTRO-DEMO-LOCK: Jessica author fixture. The desktop reference uses a
+   compact 338px author hero and a flush 20:9 lead story with no "Latest"
+   pill. Keep these rules scoped to the author template. */
+@media (min-width:901px){
+  .nx-author .nx-author-hero__inner{padding-top:clamp(56px,5.625vw,87px);padding-bottom:24px}
+  .nx-author .nx-lead-story{padding:0 0 0 clamp(32px,4.7vw,68px)}
+  .nx-author .nx-lead-story>a{grid-template-columns:repeat(2,minmax(0,620px));align-items:start}
+  .nx-author .nx-lead-story>a>img{aspect-ratio:20/9}
+}

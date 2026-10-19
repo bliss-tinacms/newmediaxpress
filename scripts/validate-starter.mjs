@@ -58,6 +58,20 @@ const multiCatFixture = read('src/content/blog/why-grocery-prices-stopped-fallin
 const fixtureCategoryBlock = multiCatFixture.match(/categories:\s*\n((?:\s+-\s+[^\n]+\n?)+)/)?.[1] || '';
 if ((fixtureCategoryBlock.match(/^\s+-\s+/gm) || []).length < 2) fail('MULTICAT-LOCK fixture must retain at least two categories.');
 
+const authorArchive = read('src/components/demo/DemoAuthorArchive.astro');
+const nmxCss = read('src/styles/newmediaxpress.css');
+if (/<small>\s*(?:Latest|\{author\.latestLabel\})\s*<\/small>/.test(authorArchive)) {
+  fail('ASTRO-DEMO-LOCK forbids the extra Latest pill in the Jessica author lead story.');
+}
+for (const requiredRule of [
+  '.nx-author .nx-author-hero__inner{padding-top:clamp(56px,5.625vw,87px);padding-bottom:24px}',
+  '.nx-author .nx-lead-story{padding:0 0 0 clamp(32px,4.7vw,68px)}',
+  '.nx-author .nx-lead-story>a{grid-template-columns:repeat(2,minmax(0,620px));align-items:start}',
+  '.nx-author .nx-lead-story>a>img{aspect-ratio:20/9}',
+]) {
+  if (!nmxCss.includes(requiredRule)) fail(`ASTRO-DEMO-LOCK missing Jessica author fixture rule: ${requiredRule}`);
+}
+
 const proxy = read('src/pages/tina-content-proxy.ts');
 if (/updateBlog|category-overrides|normalizeCategories|persistLocal|stripConfig|overrideBlogResponse/.test(proxy)) {
   fail('Tina proxy contains collection-specific compatibility or persistence logic.');
