@@ -210,6 +210,26 @@ else {
     if (!processDocument.includes(needle)) fail(`TINA-MIGRATION-GOLD.md is missing the ${label}.`);
   }
 }
+if (!existsSync(join(root, 'ASTRO-DEMO-LOCK.md'))) fail('ASTRO-DEMO-LOCK.md is required as the repository-level exact-demo contract.');
+else {
+  const demoLock = read('ASTRO-DEMO-LOCK.md');
+  const requiredDemoControls = [
+    'NO-PREMATURE-COMPLETION', 'AUTHORITY-FIRST', 'GATE-SELF-TEST', 'PRODUCTION-DATA-SHAPE',
+    'DESTINATION-ENV-ONLY', 'FRESH-PROCESS-AND-SHUTDOWN', 'SERIAL-BROWSER-GATES',
+    'RESOURCE-PREFLIGHT', 'DETERMINISTIC-TOOLCHAIN', 'PUBLISHER-BEFORE-FINAL-SHA',
+    'TRUE-ORIGIN-AND-LIVE-PROOF', 'SELF-CONTAINED-RUNTIME-AND-CLEANUP', 'STRUCTURED-EVIDENCE',
+    'CHECKPOINT-NOT-COMPLETION', 'MINIMAL-RETRY-DIAGNOSTICS', 'LITERAL-VISUAL-NON-APPROXIMATION',
+    'SHA-HTTP-NOT-VISUAL-PROOF', 'CLOUD-SOURCE-PRECEDENCE', 'REAL-WHEEL-STICKY-PROOF',
+    'RESPONSIVE-RAIL-TOC-CONTRACT', 'COMPLETE-TEMPLATE-FAMILY-MATRIX', 'FIXTURE-INTEGRITY-FIRST',
+    'DUAL-ARTIFACT-SECRET-SCAN', 'EXACT-SHA-PACKAGE-POINTER-PARITY', 'FINAL-POST-CLEANUP-ACCEPTANCE',
+  ];
+  for (const marker of requiredDemoControls) {
+    if (!demoLock.includes(marker)) fail(`ASTRO-DEMO-LOCK.md is missing mandatory control ${marker}.`);
+  }
+  for (const marker of ['AUTHENTICATED-GIT-PREFLIGHT', 'PROJECT-SECRET-MAP', 'CPANEL-ENDPOINT-NORMALIZATION', 'CPANEL-RESPONSE-NORMALIZATION']) {
+    if (!demoLock.includes(marker)) fail(`ASTRO-DEMO-LOCK.md is missing inherited GOLD blocker ${marker}.`);
+  }
+}
 if (!existsSync(join(root, 'PUBLISHER-ADMIN-GATE.md'))) fail('PUBLISHER-ADMIN-GATE.md is required for authenticated live-admin acceptance.');
 else {
   const publisherGate = read('PUBLISHER-ADMIN-GATE.md');
