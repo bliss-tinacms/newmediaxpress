@@ -232,6 +232,16 @@ else {
     ['EXACT-SHA-PACKAGE-POINTER-PARITY', 'exact immutable package and pointer parity gate'],
     ['FINAL-POST-CLEANUP-ACCEPTANCE', 'post-cleanup acceptance gate'],
     ['EXECUTABLE-LOCK-READINESS', 'executable lock readiness gate'],
+    ['SCOPED-GATE-NOT-ACCEPTANCE', 'scoped Publisher non-acceptance gate'],
+    ['COMPLETE-DOCUMENT-RESTORATION', 'complete-document restoration gate'],
+    ['PRODUCTION-RUNTIME-DEPENDENCY-CLOSURE', 'production dependency closure gate'],
+    ['RESPONSIVE-NAVIGATION-INTERACTION-CONTRACT', 'responsive navigation interaction gate'],
+    ['FRONTEND-ROUTE-RESOLUTION', 'frontend route-resolution gate'],
+    ['CANONICAL-ALIAS-PARITY', 'canonical alias parity gate'],
+    ['DETERMINISTIC-ADMIN-LOCATORS', 'deterministic admin locator gate'],
+    ['CATEGORY-ISLAND-EDITABILITY', 'category island editability gate'],
+    ['REPRESENTATION-SHAPE-MATRIX', 'production representation-shape matrix gate'],
+    ['MANDATORY-RELEASE-COMMAND-SEQUENCE', 'mandatory release command sequence gate'],
   ];
   for (const [needle, label] of requiredGates) {
     if (!processDocument.includes(needle)) fail(`TINA-MIGRATION-GOLD.md is missing the ${label}.`);
@@ -251,6 +261,10 @@ else {
     'RESPONSIVE-RAIL-TOC-CONTRACT', 'COMPLETE-TEMPLATE-FAMILY-MATRIX', 'FIXTURE-INTEGRITY-FIRST',
     'DUAL-ARTIFACT-SECRET-SCAN', 'EXACT-SHA-PACKAGE-POINTER-PARITY', 'FINAL-POST-CLEANUP-ACCEPTANCE',
     'EXECUTABLE-LOCK-READINESS',
+    'SCOPED-GATE-NOT-ACCEPTANCE', 'COMPLETE-DOCUMENT-RESTORATION',
+    'RESPONSIVE-NAVIGATION-INTERACTION-CONTRACT', 'FRONTEND-ROUTE-RESOLUTION',
+    'CANONICAL-ALIAS-PARITY', 'DETERMINISTIC-ADMIN-LOCATORS', 'CATEGORY-ISLAND-EDITABILITY',
+    'REPRESENTATION-SHAPE-MATRIX', 'MANDATORY-RELEASE-COMMAND-SEQUENCE',
   ];
   for (const marker of requiredDemoControls) {
     if (!demoLock.includes(marker)) fail(`ASTRO-DEMO-LOCK.md is missing mandatory control ${marker}.`);

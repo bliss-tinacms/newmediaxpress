@@ -33,6 +33,16 @@ A build, SHA, `RELEASE_COMMIT`, HTTP `200`, screenshot taken at the wrong viewpo
 25. **FINAL-POST-CLEANUP-ACCEPTANCE** — After cleanup, rerun route/asset health, pointer/rollback/runtime dependency proof, canonical admin shell and required read-only live lock checks. Final reporting must use this state.
 26. **EXECUTABLE-LOCK-READINESS** — Policy markers alone cannot pass this lock. Require validator-enforced executable preflight and controlled-negative preflight, all lock controls, a complete no-extra-file SHA-256 authority manifest, a real positive browser validator, a controlled-negative browser suite and real positive/negative lock commands. Missing authority or browser gates is machine-readable `BLOCKED` with exit `2`; never derive authority from the destination or point the positive lock command only at preflight.
 
+27. **SCOPED-GATE-NOT-ACCEPTANCE** — Scoped Publisher runs are diagnostic and must emit a distinct non-acceptance marker. Only an unscoped schema-complete run may satisfy final acceptance.
+28. **COMPLETE-DOCUMENT-RESTORATION** — Snapshot and hash each complete source document before mutation; require exact or explicitly normalized whole-document restoration, marker absence, and no unrelated drift after save/restore.
+29. **RESPONSIVE-NAVIGATION-INTERACTION-CONTRACT** — Prove closed mobile navigation through 1024px, desktop navigation from 1025px, pointer and keyboard open/close, Escape focus return, link/outside close, resize reset, ARIA correctness, CMS links and zero overflow; include a controlled negative.
+30. **FRONTEND-ROUTE-RESOLUTION** — Protect permalink → `_sys` → document ID/hash → title-fallback priority with executable tests, including root, encoded and nested paths.
+31. **CANONICAL-ALIAS-PARITY** — Lock every compatibility alias to an explicit canonical target and status while independently proving the canonical route.
+32. **DETERMINISTIC-ADMIN-LOCATORS** — Admin gates must target a unique configured field/document identity and fail before mutation on ambiguous, stale or missing locators.
+33. **CATEGORY-ISLAND-EDITABILITY** — Category islands require the same real-query, exact-variable, authoritative-data, stable-form and primary-form proof as Author islands.
+34. **REPRESENTATION-SHAPE-MATRIX** — Prove object-rich-text, string, absent and fallback body representations preserve one DOM/style wrapper; include a wrapper-removal controlled negative.
+35. **MANDATORY-RELEASE-COMMAND-SEQUENCE** — Validators must require and the release must execute preflight, positive/negative lock, responsive positive/negative, complete Publisher, post-Publisher lineage rebuild, live recheck and post-cleanup acceptance in order.
+
 ## Transport gates inherited from GOLD
 
 `AUTHENTICATED-GIT-PREFLIGHT`, `PROJECT-SECRET-MAP`, `CPANEL-ENDPOINT-NORMALIZATION` and `CPANEL-RESPONSE-NORMALIZATION` remain transport controls in `TINA-MIGRATION-GOLD.md`. If any prevents live proof, this lock is `BLOCKED`.
