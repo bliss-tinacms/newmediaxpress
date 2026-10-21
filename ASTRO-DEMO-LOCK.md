@@ -100,7 +100,6 @@ The complete `HNT-001` through `HNT-054` problem → solution → prevention →
 
 This ledger is append-only under the same supersession rule as GOLD. Documentation presence alone still does not pass any row.
 
-
 ## Executable acceptance
 
 Documentation presence is insufficient. The project must implement applicable checks in its source validator, demo-lock, controlled-negative suite, Tina/admin fullcheck, immutable packager/deployer and cleanup verification. The repository validator must reject a missing `ASTRO-DEMO-LOCK.md` or any missing mandatory control above.

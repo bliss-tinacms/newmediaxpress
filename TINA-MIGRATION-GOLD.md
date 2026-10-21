@@ -469,7 +469,6 @@ This is the explicit postmortem required by the latest migration. It is not a su
 
 The ledger is append-only for discovered migration failures. A row may be superseded only by a stricter row that names the superseded ID; silent deletion, collapsing several incidents into an unnamed generality, or retaining prevention without the problem and solution is forbidden.
 
-
 ## Required validator coverage
 
 The repository validator must reject at minimum:
